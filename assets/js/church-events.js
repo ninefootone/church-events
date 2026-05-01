@@ -2,16 +2,15 @@
  * Church Events — Frontend JS
  *
  * Handles:
- *  - FullCalendar month grid initialisation
- *  - List/grid view rendering
- *  - Category filter population (paginated REST fetch)
- *  - Text search + category filtering
+ *  - FullCalendar month grid
+ *  - List/grid view with pagination (Load More)
+ *  - Category, text search, and date range filtering
  *  - View toggle (calendar <-> list) with responsive auto-switch at 768px
  *  - Filter persistence across calendar month navigation
  *  - Event detail modal
  *  - Hover preview popover
  *
- * All config passed from PHP via ceConfig (wp_localize_script).
+ * Config passed from PHP via ceConfig (wp_localize_script).
  */
 
 ( function () {
@@ -97,6 +96,34 @@
 		return results;
 	}
 
+	/**
+	 * Fetch a single page of events with filters.
+	 * Returns { events, total, totalPages }.
+	 */
+	async function fetchEventPage( filters, page, perPage ) {
+		perPage = perPage || cfg.perPage || 12;
+		let url = cfg.restUrl
+			+ '?cal_after='  + filters.after
+			+ '&cal_before=' + filters.before
+			+ '&per_page='   + perPage
+			+ '&page='       + page;
+
+		if ( filters.category ) url += '&event_category=' + encodeURIComponent( filters.category );
+		if ( filters.search )   url += '&event_search='   + encodeURIComponent( filters.search );
+
+		const response = await fetch( url, { headers: { 'X-WP-Nonce': cfg.restNonce } } );
+		if ( ! response.ok ) return { events: [], total: 0, totalPages: 0 };
+
+		const total      = parseInt( response.headers.get( 'X-WP-Total' ) || '0', 10 );
+		const totalPages = parseInt( response.headers.get( 'X-WP-TotalPages' ) || '0', 10 );
+		const events     = await response.json();
+
+		return { events, total, totalPages };
+	}
+
+	/**
+	 * Fetch events for a date range (calendar use — no pagination needed).
+	 */
 	async function fetchEvents( after, before, category, search ) {
 		let url = cfg.restUrl + '?cal_after=' + after + '&cal_before=' + before + '&per_page=100';
 		if ( category ) url += '&event_category=' + encodeURIComponent( category );
@@ -107,7 +134,7 @@
 	}
 
 	// ---------------------------------------------------------------------------
-	// Category filter
+	// Category filter population
 	// ---------------------------------------------------------------------------
 
 	async function populateCategoryFilter( select ) {
@@ -143,6 +170,7 @@
 		const title = decodeEntities( ( event.title && event.title.rendered ) || '' );
 
 		switch ( key ) {
+
 			case 'featured_image':
 				if ( ! event.featured_image_url ) return '';
 				return '<div class="ce-card-image"><img src="' + event.featured_image_url + '" alt="' + title + '" loading="lazy" /></div>';
@@ -154,12 +182,15 @@
 			case 'date': {
 				const ds = formatDate( meta.start_date );
 				if ( ! ds ) return '';
-				const de = ( meta.end_date && meta.end_date !== meta.start_date ) ? ' \u2013 ' + formatDate( meta.end_date ) : '';
+				const de = ( meta.end_date && meta.end_date !== meta.start_date )
+					? ' \u2013 ' + formatDate( meta.end_date ) : '';
 				return '<span class="ce-card-meta-item ce-meta-date">' + ds + de + '</span>';
 			}
 
 			case 'time': {
-				if ( isAllDay( meta ) ) return '<span class="ce-card-meta-item ce-meta-time">' + cfg.i18n.allDay + '</span>';
+				if ( isAllDay( meta ) ) {
+					return '<span class="ce-card-meta-item ce-meta-time">' + cfg.i18n.allDay + '</span>';
+				}
 				const st = formatTime( meta.start_time );
 				const et = meta.end_time ? formatTime( meta.end_time ) : '';
 				const ts = et ? st + ' \u2013 ' + et : st;
@@ -178,8 +209,7 @@
 			case 'excerpt': {
 				if ( context === 'detail' ) return '';
 				const ex = event.excerpt && event.excerpt.rendered
-					? event.excerpt.rendered.replace( /<[^>]+>/g, '' ).trim()
-					: '';
+					? event.excerpt.rendered.replace( /<[^>]+>/g, '' ).trim() : '';
 				if ( ! ex ) return '';
 				return '<p class="ce-card-excerpt">' + ex + '</p>';
 			}
@@ -197,8 +227,7 @@
 				return '<div class="ce-card-categories">' +
 					cats.map( function( c ) {
 						return '<span class="ce-category-tag">' + decodeEntities( c.name ) + '</span>';
-					} ).join( '' ) +
-				'</div>';
+					} ).join( '' ) + '</div>';
 			}
 
 			case 'booking_link': {
@@ -241,7 +270,8 @@
 		let html = '', metaOpen = false;
 
 		if ( fields.indexOf( 'featured_image' ) !== -1 && event.featured_image_url ) {
-			html += '<div class="ce-modal-image"><img src="' + event.featured_image_url + '" alt="' + decodeEntities( ( event.title && event.title.rendered ) || '' ) + '" /></div>';
+			html += '<div class="ce-modal-image"><img src="' + event.featured_image_url
+				+ '" alt="' + decodeEntities( ( event.title && event.title.rendered ) || '' ) + '" /></div>';
 		}
 
 		html += '<div class="ce-modal-body">';
@@ -257,7 +287,8 @@
 		if ( metaOpen ) html += '</div>';
 
 		if ( cfg.interaction === 'page' && event.event_url ) {
-			html += '<div class="ce-modal-footer"><a href="' + event.event_url + '" class="ce-btn ce-btn-primary">' + cfg.i18n.viewDetails + '</a></div>';
+			html += '<div class="ce-modal-footer"><a href="' + event.event_url
+				+ '" class="ce-btn ce-btn-primary">' + cfg.i18n.viewDetails + '</a></div>';
 		}
 
 		html += '</div>';
@@ -272,17 +303,12 @@
 		this.overlay  = root.querySelector( '.ce-modal-overlay' );
 		this.content  = this.overlay && this.overlay.querySelector( '.ce-modal-content' );
 		this.closeBtn = this.overlay && this.overlay.querySelector( '.ce-modal-close' );
-
 		if ( ! this.overlay ) return;
-
 		var self = this;
-
 		this.closeBtn && this.closeBtn.addEventListener( 'click', function() { self.close(); } );
-
 		this.overlay.addEventListener( 'click', function( e ) {
 			if ( e.target === self.overlay ) self.close();
 		} );
-
 		document.addEventListener( 'keydown', function( e ) {
 			if ( e.key === 'Escape' && ! self.overlay.hidden ) self.close();
 		} );
@@ -321,7 +347,8 @@
 		var meta  = event.event_meta || {};
 		var time  = isAllDay( meta ) ? cfg.i18n.allDay : ( formatTime( meta.start_time ) || '' );
 		this.titleEl.textContent = decodeEntities( ( event.title && event.title.rendered ) || '' );
-		this.metaEl.textContent  = [ formatDate( meta.start_date ), time, meta.location ].filter( Boolean ).join( ' \u00B7 ' );
+		this.metaEl.textContent  = [ formatDate( meta.start_date ), time, meta.location ]
+			.filter( Boolean ).join( ' \u00B7 ' );
 		this.el.hidden = false;
 		this.position( anchor );
 		var el = this.el;
@@ -344,24 +371,61 @@
 	};
 
 	// ---------------------------------------------------------------------------
-	// List view
+	// List view — with pagination
 	// ---------------------------------------------------------------------------
 
 	function ListView( root, modal, hover ) {
-		this.root   = root;
-		this.modal  = modal;
-		this.hover  = hover;
-		this.output = root.querySelector( '.ce-view--list .ce-events-output' );
+		this.root        = root;
+		this.modal       = modal;
+		this.hover       = hover;
+		this.output      = root.querySelector( '.ce-view--list .ce-events-output' );
+		this.loadMoreBtn = null;
+		this.currentPage = 1;
+		this.totalPages  = 1;
+		this.filters     = {};
 	}
 
 	ListView.prototype.showLoading = function() {
-		if ( this.output ) this.output.innerHTML = '<div class="ce-loading">' + cfg.i18n.loading + '</div>';
+		if ( this.output ) {
+			this.output.innerHTML = '<div class="ce-loading">' + cfg.i18n.loading + '</div>';
+		}
 	};
 
-	ListView.prototype.render = function( events ) {
+	ListView.prototype.showLoadingMore = function() {
+		if ( this.loadMoreBtn ) {
+			this.loadMoreBtn.disabled     = true;
+			this.loadMoreBtn.textContent  = cfg.i18n.loading;
+		}
+	};
+
+	ListView.prototype.load = async function( filters, append ) {
+		this.filters = filters;
+
+		if ( ! append ) {
+			this.currentPage = 1;
+			this.showLoading();
+		} else {
+			this.currentPage++;
+			this.showLoadingMore();
+		}
+
+		try {
+			const result = await fetchEventPage( filters, this.currentPage );
+			this.totalPages = result.totalPages;
+			this.render( result.events, append );
+		} catch ( e ) {
+			console.warn( 'Church Events: list fetch failed.', e );
+		}
+	};
+
+	ListView.prototype.render = function( events, append ) {
 		if ( ! this.output ) return;
 
-		if ( ! events.length ) {
+		// Remove existing load more button
+		var existing = this.output.parentNode.querySelector( '.ce-load-more-wrap' );
+		if ( existing ) existing.remove();
+
+		if ( ! append && ! events.length ) {
 			this.output.innerHTML = '<div class="ce-no-events">' + cfg.i18n.noEvents + '</div>';
 			return;
 		}
@@ -372,15 +436,22 @@
 		var modal   = this.modal;
 		var hover   = this.hover;
 
-		var wrapper     = document.createElement( 'div' );
-		wrapper.className = layout === 'list' ? 'ce-events-list' : 'ce-events-grid';
-		if ( layout === 'grid' ) wrapper.style.setProperty( '--ce-columns', columns );
+		if ( ! append ) {
+			this.output.innerHTML = '';
+			var wrapper           = document.createElement( 'div' );
+			wrapper.className     = layout === 'list' ? 'ce-events-list' : 'ce-events-grid';
+			wrapper.dataset.ceList = '1';
+			if ( layout === 'grid' ) wrapper.style.setProperty( '--ce-columns', columns );
+			this.output.appendChild( wrapper );
+		}
+
+		var wrapper = this.output.querySelector( '[data-ce-list]' );
 
 		events.forEach( function( event ) {
-			var card      = document.createElement( 'article' );
-			card.className  = 'ce-event-card';
-			card.innerHTML  = buildCard( event, fields );
-			card.dataset.id = event.id;
+			var card         = document.createElement( 'article' );
+			card.className   = 'ce-event-card';
+			card.innerHTML   = buildCard( event, fields );
+			card.dataset.id  = event.id;
 
 			card.addEventListener( 'click', function() {
 				if ( cfg.interaction === 'modal' ) {
@@ -398,8 +469,23 @@
 			wrapper.appendChild( card );
 		} );
 
-		this.output.innerHTML = '';
-		this.output.appendChild( wrapper );
+		// Load more button
+		if ( this.currentPage < this.totalPages ) {
+			var self     = this;
+			var wrap     = document.createElement( 'div' );
+			wrap.className = 'ce-load-more-wrap';
+
+			var btn       = document.createElement( 'button' );
+			btn.className = 'ce-btn ce-btn-load-more';
+			btn.textContent = cfg.i18n.loadMore;
+			btn.addEventListener( 'click', function() {
+				self.load( self.filters, true );
+			} );
+
+			wrap.appendChild( btn );
+			this.output.parentNode.appendChild( wrap );
+			this.loadMoreBtn = btn;
+		}
 	};
 
 	// ---------------------------------------------------------------------------
@@ -407,25 +493,24 @@
 	// ---------------------------------------------------------------------------
 
 	function CalendarView( root, modal, hover ) {
-		this.root            = root;
-		this.modal           = modal;
-		this.hover           = hover;
-		this.el              = root.querySelector( '#ce-calendar' );
-		this.calendar        = null;
-		this.activeCategory  = '';
-		this.activeSearch    = '';
+		this.root           = root;
+		this.modal          = modal;
+		this.hover          = hover;
+		this.el             = root.querySelector( '#ce-calendar' );
+		this.calendar       = null;
+		this.activeCategory = '';
+		this.activeSearch   = '';
 	}
 
 	CalendarView.prototype.init = function() {
 		if ( ! this.el || typeof FullCalendar === 'undefined' ) return;
-
 		var self = this;
 
 		this.calendar = new FullCalendar.Calendar( this.el, {
-			initialView:   'dayGridMonth',
-			headerToolbar: { left: 'prev,next today', center: 'title', right: '' },
-			height:        'auto',
-			firstDay:      1,
+			initialView:     'dayGridMonth',
+			headerToolbar:   { left: 'prev,next today', center: 'title', right: '' },
+			height:          'auto',
+			firstDay:        1,
 			eventTimeFormat: { hour: '2-digit', minute: '2-digit', hour12: false },
 
 			events: function( info, successCallback, failureCallback ) {
@@ -436,10 +521,10 @@
 				var time  = arg.event.extendedProps.startTime || '';
 				var title = arg.event.title;
 				return {
-					html: '<div class="ce-fc-event">' +
-						( time ? '<span class="ce-fc-time">' + time + '</span>' : '' ) +
-						'<span class="ce-fc-title">' + title + '</span>' +
-					'</div>',
+					html: '<div class="ce-fc-event">'
+						+ ( time ? '<span class="ce-fc-time">' + time + '</span>' : '' )
+						+ '<span class="ce-fc-title">' + title + '</span>'
+						+ '</div>',
 				};
 			},
 
@@ -472,7 +557,8 @@
 			var after  = dateToYMD( info.start );
 			var before = dateToYMD( info.end );
 			var events = await fetchEvents( after, before, this.activeCategory, this.activeSearch );
-			successCallback( events.map( function( e ) { return this.toFCEvent( e ); }, this ) );
+			var self   = this;
+			successCallback( events.map( function( e ) { return self.toFCEvent( e ); } ) );
 		} catch ( err ) {
 			console.warn( 'Church Events: calendar fetch failed.', err );
 			failureCallback( err );
@@ -514,6 +600,8 @@
 		this.currentView    = 'calendar';
 		this.activeCategory = '';
 		this.activeSearch   = '';
+		this.activeDateFrom = '';
+		this.activeDateTo   = '';
 		this.searchTimer    = null;
 		this.defaultView    = root.dataset.defaultView || cfg.defaultView || 'toggle';
 
@@ -528,9 +616,25 @@
 		this.handleResponsive();
 	};
 
+	ChurchEvents.prototype.getListFilters = function() {
+		var now    = new Date();
+		var future = new Date( now.getFullYear() + 2, now.getMonth(), now.getDate() );
+
+		// Use date filter inputs if set, otherwise default range
+		var after  = this.activeDateFrom || dateToYMD( now );
+		var before = this.activeDateTo   || dateToYMD( future );
+
+		return {
+			after:    after,
+			before:   before,
+			category: this.activeCategory,
+			search:   this.activeSearch,
+		};
+	};
+
 	ChurchEvents.prototype.bindToolbar = function() {
-		var self     = this;
-		var btns     = this.root.querySelectorAll( '[data-ce-view]' );
+		var self = this;
+		var btns = this.root.querySelectorAll( '[data-ce-view]' );
 
 		btns.forEach( function( btn ) {
 			btn.addEventListener( 'click', function() {
@@ -556,6 +660,18 @@
 				self.applyFilters();
 			}, 350 );
 		} );
+
+		var dateFrom = this.root.querySelector( '.ce-filter-date-from' );
+		dateFrom && dateFrom.addEventListener( 'change', function() {
+			self.activeDateFrom = dateFrom.value ? dateFrom.value.replace( /-/g, '' ) : '';
+			self.applyFilters();
+		} );
+
+		var dateTo = this.root.querySelector( '.ce-filter-date-to' );
+		dateTo && dateTo.addEventListener( 'change', function() {
+			self.activeDateTo = dateTo.value ? dateTo.value.replace( /-/g, '' ) : '';
+			self.applyFilters();
+		} );
 	};
 
 	ChurchEvents.prototype.initViews = function() {
@@ -566,7 +682,7 @@
 			calView  && calView.classList.remove( 'is-active' );
 			listView && listView.classList.add( 'is-active' );
 			this.currentView = 'list';
-			this.loadListView();
+			this.list.load( this.getListFilters(), false );
 		} else {
 			calView  && calView.classList.add( 'is-active' );
 			listView && listView.classList.remove( 'is-active' );
@@ -594,25 +710,15 @@
 		} else {
 			calView  && calView.classList.remove( 'is-active' );
 			listView && listView.classList.add( 'is-active' );
-			this.loadListView();
+			this.list.load( this.getListFilters(), false );
 		}
-	};
-
-	ChurchEvents.prototype.loadListView = async function() {
-		this.list.showLoading();
-		var now    = new Date();
-		var after  = dateToYMD( now );
-		var future = new Date( now.getFullYear(), now.getMonth() + 3, 1 );
-		var before = dateToYMD( future );
-		var events = await fetchEvents( after, before, this.activeCategory, this.activeSearch );
-		this.list.render( events );
 	};
 
 	ChurchEvents.prototype.applyFilters = function() {
 		if ( this.currentView === 'calendar' ) {
 			this.cal && this.cal.setFilters( this.activeCategory, this.activeSearch );
 		} else {
-			this.loadListView();
+			this.list.load( this.getListFilters(), false );
 		}
 	};
 

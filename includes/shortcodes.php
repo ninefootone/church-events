@@ -167,7 +167,11 @@ function ce_build_js_config() {
 			'filterAll'       => __( 'All categories', 'church-events' ),
 			'calendarView'    => __( 'Calendar', 'church-events' ),
 			'listView'        => __( 'List', 'church-events' ),
+			'loadMore'        => __( 'Load More', 'church-events' ),
+			'dateFrom'        => __( 'From', 'church-events' ),
+			'dateTo'          => __( 'To', 'church-events' ),
 		),
+		'perPage'         => (int) ce_get_option( 'per_page', 12 ),
 	);
 }
 
@@ -285,6 +289,16 @@ function ce_render_toolbar( $default_view ) {
 			<select class="ce-filter-category" aria-label="<?php esc_attr_e( 'Filter by category', 'church-events' ); ?>">
 				<option value=""><?php esc_html_e( 'All categories', 'church-events' ); ?></option>
 			</select>
+			<input
+				type="date"
+				class="ce-filter-date-from"
+				aria-label="<?php esc_attr_e( 'From date', 'church-events' ); ?>"
+			/>
+			<input
+				type="date"
+				class="ce-filter-date-to"
+				aria-label="<?php esc_attr_e( 'To date', 'church-events' ); ?>"
+			/>
 		</div>
 
 	</div>

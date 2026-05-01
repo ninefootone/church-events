@@ -593,3 +593,61 @@
 	border-top:  1px solid var( --ce-border-color );
 	margin-top:  1rem;
 }
+
+/* -------------------------------------------------------------------------
+   Load More button
+   ------------------------------------------------------------------------- */
+
+.ce-load-more-wrap {
+	text-align: center;
+	padding: 2rem 0 1rem;
+}
+
+.ce-btn-load-more {
+	padding: 0.6rem 2rem;
+	font-size: var( --ce-font-size-body );
+	border-radius: var( --ce-btn-radius );
+	border: 2px solid var( --ce-primary );
+	background: transparent;
+	color: var( --ce-primary );
+	cursor: pointer;
+	transition: background var( --ce-transition ), color var( --ce-transition );
+}
+
+.ce-btn-load-more:hover {
+	background: var( --ce-primary );
+	color: #ffffff;
+}
+
+.ce-btn-load-more:disabled {
+	opacity: 0.6;
+	cursor: wait;
+}
+
+/* -------------------------------------------------------------------------
+   Date filter inputs
+   ------------------------------------------------------------------------- */
+
+.ce-filter-date-from,
+.ce-filter-date-to {
+	padding: 0.45rem 0.75rem;
+	font-size: var( --ce-font-size-meta );
+	border: 1px solid var( --ce-border-color );
+	border-radius: var( --ce-btn-radius );
+	background: #ffffff;
+	color: var( --ce-text );
+}
+
+.ce-filter-date-from:focus,
+.ce-filter-date-to:focus {
+	outline: 2px solid var( --ce-secondary );
+	outline-offset: 2px;
+	border-color: var( --ce-secondary );
+}
+
+@media ( max-width: 768px ) {
+	.ce-filter-date-from,
+	.ce-filter-date-to {
+		width: 100%;
+	}
+}

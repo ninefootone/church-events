@@ -53,6 +53,7 @@ function ce_sanitize_settings( $input ) {
 	$sanitized['image_ratio']       = isset( $input['image_ratio'] ) ? sanitize_text_field( $input['image_ratio'] ) : '16:9';
 	$sanitized['default_view']      = isset( $input['default_view'] ) ? sanitize_text_field( $input['default_view'] ) : 'toggle';
 	$sanitized['grid_columns']      = isset( $input['grid_columns'] ) ? absint( $input['grid_columns'] ) : 3;
+	$sanitized['per_page']          = isset( $input['per_page'] ) ? absint( $input['per_page'] ) : 12;
 
 	// Interactions
 	$sanitized['card_interaction']  = isset( $input['card_interaction'] ) ? sanitize_text_field( $input['card_interaction'] ) : 'modal';
@@ -358,6 +359,19 @@ function ce_render_tab_display( $s ) {
 				</select>
 			</td>
 		</tr>
+		<tr>
+			<th><label for="ce_per_page"><?php esc_html_e( 'Events Per Page (list view)', 'church-events' ); ?></label></th>
+			<td>
+				<select id="ce_per_page" name="ce_settings[per_page]">
+					<?php
+					$per_page = isset( $s['per_page'] ) ? (int) $s['per_page'] : 12;
+					foreach ( array( 6, 9, 12, 18, 24 ) as $n ) : ?>
+						<option value="<?php echo $n; ?>" <?php selected( $per_page, $n ); ?>><?php echo $n; ?></option>
+					<?php endforeach; ?>
+				</select>
+				<p class="description"><?php esc_html_e( 'Events shown before the Load More button appears.', 'church-events' ); ?></p>
+			</td>
+		</tr>				
 	</table>
 	<?php
 }
