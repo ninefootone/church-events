@@ -91,3 +91,24 @@
 .ce-settings-wrap .widefat code {
 	font-size: 12px;
 }
+
+/* Sync status badge */
+.ce-sync-badge {
+	display: inline-block;
+	padding: 2px 10px;
+	border-radius: 100px;
+	font-size: 12px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+}
+
+.ce-sync-success {
+	background: #d1fae5;
+	color: #065f46;
+}
+
+.ce-sync-error {
+	background: #fee2e2;
+	color: #991b1b;
+}

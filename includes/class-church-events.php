@@ -41,6 +41,7 @@ class Church_Events {
 	 * Require all module files.
 	 */
 	private function load_dependencies() {
+		require_once CE_PLUGIN_DIR . 'includes/db.php';
 		require_once CE_PLUGIN_DIR . 'includes/cpt.php';
 		require_once CE_PLUGIN_DIR . 'includes/meta.php';
 		require_once CE_PLUGIN_DIR . 'includes/rest-api.php';
@@ -77,6 +78,7 @@ class Church_Events {
 		// Ensure CPT is registered before flushing
 		ce_register_cpt();
 		flush_rewrite_rules();
+		ce_add_meta_indexes();
 	}
 
 	/**

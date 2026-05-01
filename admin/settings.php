@@ -62,6 +62,7 @@ function ce_sanitize_settings( $input ) {
 	$sanitized['default_view']      = isset( $input['default_view'] ) ? sanitize_text_field( $input['default_view'] ) : 'toggle';
 	$sanitized['grid_columns']      = isset( $input['grid_columns'] ) ? absint( $input['grid_columns'] ) : 3;
 	$sanitized['per_page']          = isset( $input['per_page'] ) ? absint( $input['per_page'] ) : 12;
+	$sanitized['fallback_image_id']  = isset( $input['fallback_image_id'] ) ? absint( $input['fallback_image_id'] ) : 0;
 
 	// Interactions
 	$sanitized['card_interaction']  = isset( $input['card_interaction'] ) ? sanitize_text_field( $input['card_interaction'] ) : 'modal';
@@ -165,6 +166,8 @@ function ce_admin_enqueue( $hook ) {
 		array(),
 		CE_VERSION
 	);
+
+	wp_enqueue_media();
 
 	wp_enqueue_script(
 		'ce-admin',
@@ -404,7 +407,28 @@ function ce_render_tab_display( $s ) {
 				</select>
 				<p class="description"><?php esc_html_e( 'Events shown before the Load More button appears.', 'church-events' ); ?></p>
 			</td>
-		</tr>				
+		</tr>
+
+		<tr>
+			<th><?php esc_html_e( 'Fallback Image', 'church-events' ); ?></th>
+			<td>
+				<?php
+				$fallback_id  = isset( $s['fallback_image_id'] ) ? (int) $s['fallback_image_id'] : 0;
+				$fallback_url = $fallback_id ? wp_get_attachment_image_url( $fallback_id, 'thumbnail' ) : '';
+				?>
+				<div class="ce-fallback-image-wrap">
+					<?php if ( $fallback_url ) : ?>
+						<img src="<?php echo esc_url( $fallback_url ); ?>" style="max-width:150px;display:block;margin-bottom:8px;border-radius:4px;" />
+					<?php endif; ?>
+					<input type="hidden" id="ce_fallback_image_id" name="ce_settings[fallback_image_id]" value="<?php echo esc_attr( $fallback_id ); ?>" />
+					<button type="button" class="button button-secondary" id="ce-select-fallback-image"><?php esc_html_e( $fallback_id ? 'Change Image' : 'Select Image', 'church-events' ); ?></button>
+					<?php if ( $fallback_id ) : ?>
+						<button type="button" class="button button-secondary" id="ce-remove-fallback-image" style="margin-left:4px;"><?php esc_html_e( 'Remove', 'church-events' ); ?></button>
+					<?php endif; ?>
+				</div>
+				<p class="description"><?php esc_html_e( 'Shown when an event has no featured image.', 'church-events' ); ?></p>
+			</td>
+		</tr>
 	</table>
 	<?php
 }

@@ -89,15 +89,24 @@ function ce_rest_expose_meta() {
 		'schema' => null,
 	) );
 
-	// Also expose featured image URL directly
+	// Also expose featured image URL directly (with fallback)
 	register_rest_field( 'event', 'featured_image_url', array(
 		'get_callback' => function( $post ) {
+			$ratio = ce_get_option( 'image_ratio', '16:9' );
+			$size  = ce_image_ratio_to_size( $ratio );
+
 			if ( has_post_thumbnail( $post['id'] ) ) {
-				$ratio   = ce_get_option( 'image_ratio', '16:9' );
-				$size    = ce_image_ratio_to_size( $ratio );
 				$img_src = wp_get_attachment_image_src( get_post_thumbnail_id( $post['id'] ), $size );
-				return $img_src ? $img_src[0] : null;
+				if ( $img_src ) return $img_src[0];
 			}
+
+			// Fallback image from settings
+			$fallback_id = (int) ce_get_option( 'fallback_image_id', 0 );
+			if ( $fallback_id ) {
+				$img_src = wp_get_attachment_image_src( $fallback_id, $size );
+				if ( $img_src ) return $img_src[0];
+			}
+
 			return null;
 		},
 		'schema' => null,
