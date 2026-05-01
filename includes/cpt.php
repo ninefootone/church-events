@@ -41,6 +41,7 @@ function ce_register_cpt() {
 		'menu_icon'          => 'dashicons-calendar-alt',
 		'supports'           => array( 'title', 'editor', 'thumbnail', 'excerpt' ),
 		'show_in_rest'       => true, // Required for REST API and block editor
+		'rest_base'          => 'events',
 	);
 
 	register_post_type( 'event', $args );
