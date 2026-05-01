@@ -32,19 +32,18 @@ function ce_ajax_manual_sync() {
 		wp_send_json_error( array( 'message' => __( 'Permission denied.', 'church-events' ) ) );
 	}
 
-	// Will call the appropriate importer once import modules are built (Phase 4/5).
-	// For now, report that no importer is active.
 	$source = ce_get_option( 'source_type', 'churchsuite' );
 
 	do_action( 'ce_manual_sync', $source );
 
-	// If no handler responded, return a placeholder message
-	wp_send_json_success( array(
-		'message' => sprintf(
-			/* translators: %s: source name */
-			__( 'Sync triggered for source: %s. Import module not yet active.', 'church-events' ),
-			esc_html( $source )
-		),
-	) );
+	$last    = get_option( 'ce_last_sync_status', null );
+	$message = $last ? $last['message'] : __( 'Sync triggered.', 'church-events' );
+	$status  = $last && $last['status'] === 'error' ? 'error' : 'success';
+
+	if ( $status === 'error' ) {
+		wp_send_json_error( array( 'message' => $message ) );
+	} else {
+		wp_send_json_success( array( 'message' => $message ) );
+	}
 }
 add_action( 'wp_ajax_ce_manual_sync', 'ce_ajax_manual_sync' );

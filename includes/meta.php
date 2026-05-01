@@ -47,6 +47,12 @@ function ce_register_meta() {
 		),
 		'event_booking_text' => array( 'description' => 'Booking link label, e.g. Book Now' ),
 
+		// --- Signup ---
+		'event_signup_enabled'       => array( 'description' => 'Signup enabled: 1 or 0' ),
+
+		// --- Map ---
+		'event_map_address'          => array( 'description' => 'Full address string for Google Maps embed' ),
+
 		// --- Source IDs (for import de-duplication) ---
 		'event_source'      => array( 'description' => 'Import source: churchsuite or google' ),
 		'event_source_id'   => array( 'description' => 'Unique ID from the source system' ),

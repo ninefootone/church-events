@@ -34,6 +34,13 @@ function ce_register_settings() {
 add_action( 'admin_init', 'ce_register_settings' );
 
 /**
+ * Fire ce_settings_saved after options are updated so importers can reschedule cron.
+ */
+add_action( 'update_option_ce_settings', function() {
+	do_action( 'ce_settings_saved' );
+} );
+
+/**
  * Sanitize settings on save.
  *
  * @param array $input
@@ -48,6 +55,7 @@ function ce_sanitize_settings( $input ) {
 	$sanitized['google_cal_id']     = isset( $input['google_cal_id'] ) ? sanitize_text_field( $input['google_cal_id'] ) : '';
 	$sanitized['google_api_key']    = isset( $input['google_api_key'] ) ? sanitize_text_field( $input['google_api_key'] ) : '';
 	$sanitized['sync_interval']     = isset( $input['sync_interval'] ) ? sanitize_text_field( $input['sync_interval'] ) : 'hourly';
+	$sanitized['sync_key']          = isset( $input['sync_key'] ) ? sanitize_text_field( $input['sync_key'] ) : '';
 
 	// Display
 	$sanitized['image_ratio']       = isset( $input['image_ratio'] ) ? sanitize_text_field( $input['image_ratio'] ) : '16:9';
@@ -239,7 +247,9 @@ function ce_render_tab_import( $s ) {
 	$cs_url   = isset( $s['churchsuite_url'] ) ? $s['churchsuite_url'] : '';
 	$gcal_id  = isset( $s['google_cal_id'] ) ? $s['google_cal_id'] : '';
 	$gcal_key = isset( $s['google_api_key'] ) ? $s['google_api_key'] : '';
-	$interval = isset( $s['sync_interval'] ) ? $s['sync_interval'] : 'hourly';
+	$interval  = isset( $s['sync_interval'] ) ? $s['sync_interval'] : 'hourly';
+	$sync_key  = isset( $s['sync_key'] ) ? $s['sync_key'] : '';
+	$last_sync = get_option( 'ce_last_sync_status', null );
 	?>
 	<h2><?php esc_html_e( 'Import Settings', 'church-events' ); ?></h2>
 	<p class="description"><?php esc_html_e( 'Connect to either ChurchSuite or Google Calendar as your event source.', 'church-events' ); ?></p>
@@ -297,6 +307,15 @@ function ce_render_tab_import( $s ) {
 		</tr>
 
 		<tr>
+			<th><label for="ce_sync_key"><?php esc_html_e( 'Server Cron Key', 'church-events' ); ?></label></th>
+			<td>
+				<input type="text" id="ce_sync_key" name="ce_settings[sync_key]" value="<?php echo esc_attr( $sync_key ); ?>" class="regular-text" />
+				<button type="button" id="ce-generate-key" class="button button-secondary" style="margin-left:8px;"><?php esc_html_e( 'Generate', 'church-events' ); ?></button>
+				<p class="description"><?php esc_html_e( 'Used to secure the REST sync endpoint for server cron jobs. Send as X-CE-Sync-Key header.', 'church-events' ); ?></p>
+			</td>
+		</tr>
+
+		<tr>
 			<th><?php esc_html_e( 'Manual Sync', 'church-events' ); ?></th>
 			<td>
 				<button type="button" id="ce-sync-now" class="button button-secondary"><?php esc_html_e( 'Sync Now', 'church-events' ); ?></button>
@@ -304,6 +323,20 @@ function ce_render_tab_import( $s ) {
 				<p class="description"><?php esc_html_e( 'Trigger an immediate sync from the source.', 'church-events' ); ?></p>
 			</td>
 		</tr>
+
+		<?php if ( $last_sync ) : ?>
+		<tr>
+			<th><?php esc_html_e( 'Last Sync', 'church-events' ); ?></th>
+			<td>
+				<span class="ce-sync-badge ce-sync-<?php echo esc_attr( $last_sync['status'] ); ?>">
+					<?php echo esc_html( ucfirst( $last_sync['status'] ) ); ?>
+				</span>
+				<span style="margin-left:8px;color:#646970;"><?php echo esc_html( $last_sync['time'] ); ?></span>
+				<p class="description"><?php echo esc_html( $last_sync['message'] ); ?></p>
+			</td>
+		</tr>
+		<?php endif; ?>
+
 	</table>
 	<?php
 }

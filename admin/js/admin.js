@@ -54,4 +54,14 @@ jQuery( function ( $ ) {
 			$status.addClass( 'error' ).text( 'Request failed. Please try again.' );
 		} );
 	} );
+	// --- Generate sync key ---
+	$( '#ce-generate-key' ).on( 'click', function () {
+		var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+		var key   = '';
+		for ( var i = 0; i < 32; i++ ) {
+			key += chars.charAt( Math.floor( Math.random() * chars.length ) );
+		}
+		$( '#ce_sync_key' ).val( key );
+	} );
+
 } );
