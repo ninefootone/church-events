@@ -1,0 +1,443 @@
+/**
+ * Church Events — Frontend Styles
+ *
+ * All rules are scoped under .church-events to avoid conflicts.
+ * Override using CSS custom properties — no !important needed.
+ *
+ * Elementor sites: map to global colour variables in your
+ * custom CSS or via Events → Settings → Styling:
+ *
+ *   .church-events {
+ *     --ce-primary: var(--e-global-color-primary);
+ *     --ce-secondary: var(--e-global-color-secondary);
+ *     --ce-text: var(--e-global-color-text);
+ *     --ce-accent: var(--e-global-color-accent);
+ *   }
+ */
+
+/* -------------------------------------------------------------------------
+   Custom Properties (design tokens)
+   ------------------------------------------------------------------------- */
+
+.church-events {
+
+	/* Colours — set from plugin settings, overrideable via CSS */
+	--ce-primary:         #083C5E;
+	--ce-secondary:       #35878C;
+	--ce-text:            #333333;
+	--ce-accent:          #C1789C;
+	--ce-bg:              transparent;
+	--ce-card-bg:         #ffffff;
+	--ce-border-color:    #e0e0e0;
+	--ce-muted:           #666666;
+
+	/* Typography */
+	--ce-font-size-title: 1.125rem;
+	--ce-font-size-meta:  0.875rem;
+	--ce-font-size-body:  1rem;
+	--ce-line-height:     1.6;
+
+	/* Cards */
+	--ce-card-radius:     6px;
+	--ce-card-gap:        1.5rem;
+	--ce-card-shadow:     0 2px 8px rgba(0, 0, 0, 0.08);
+	--ce-card-padding:    1.25rem;
+
+	/* Image ratios */
+	--ce-image-ratio:     56.25%; /* 16:9 default — overridden by PHP */
+
+	/* Calendar */
+	--ce-calendar-height: 650px;
+
+	/* Modal */
+	--ce-modal-max-width: 640px;
+	--ce-modal-overlay:   rgba(0, 0, 0, 0.6);
+	--ce-modal-radius:    8px;
+
+	/* Buttons */
+	--ce-btn-radius:      4px;
+	--ce-btn-padding:     0.5rem 1.25rem;
+	--ce-btn-font-size:   0.9rem;
+
+	/* Transitions */
+	--ce-transition:      0.2s ease;
+
+	/* Layout */
+	background: var( --ce-bg );
+	color: var( --ce-text );
+	font-size: var( --ce-font-size-body );
+	line-height: var( --ce-line-height );
+	box-sizing: border-box;
+}
+
+.church-events *,
+.church-events *::before,
+.church-events *::after {
+	box-sizing: inherit;
+}
+
+/* -------------------------------------------------------------------------
+   Toolbar (view toggle + filters)
+   ------------------------------------------------------------------------- */
+
+.ce-toolbar {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.75rem;
+	margin-bottom: 1.5rem;
+}
+
+.ce-view-toggle {
+	display: flex;
+	gap: 0.5rem;
+}
+
+.ce-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	padding: var( --ce-btn-padding );
+	font-size: var( --ce-btn-font-size );
+	border-radius: var( --ce-btn-radius );
+	border: 2px solid var( --ce-primary );
+	background: transparent;
+	color: var( --ce-primary );
+	cursor: pointer;
+	transition: background var( --ce-transition ), color var( --ce-transition );
+	text-decoration: none;
+	line-height: 1;
+}
+
+.ce-btn:hover,
+.ce-btn.is-active {
+	background: var( --ce-primary );
+	color: #ffffff;
+}
+
+.ce-btn-primary {
+	background: var( --ce-primary );
+	color: #ffffff;
+}
+
+.ce-btn-primary:hover {
+	background: var( --ce-secondary );
+	border-color: var( --ce-secondary );
+}
+
+/* Filter bar */
+.ce-filters {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.75rem;
+	flex: 1;
+}
+
+.ce-filter-select,
+.ce-filter-search {
+	padding: 0.45rem 0.75rem;
+	font-size: var( --ce-font-size-meta );
+	border: 1px solid var( --ce-border-color );
+	border-radius: var( --ce-btn-radius );
+	background: #ffffff;
+	color: var( --ce-text );
+	min-width: 160px;
+}
+
+.ce-filter-select:focus,
+.ce-filter-search:focus {
+	outline: 2px solid var( --ce-secondary );
+	outline-offset: 2px;
+	border-color: var( --ce-secondary );
+}
+
+/* -------------------------------------------------------------------------
+   Grid / List layout
+   ------------------------------------------------------------------------- */
+
+.ce-events-grid {
+	display: grid;
+	grid-template-columns: repeat( var( --ce-columns, 3 ), 1fr );
+	gap: var( --ce-card-gap );
+}
+
+.ce-events-list {
+	display: flex;
+	flex-direction: column;
+	gap: var( --ce-card-gap );
+}
+
+/* -------------------------------------------------------------------------
+   Event Card
+   ------------------------------------------------------------------------- */
+
+.ce-event-card {
+	background: var( --ce-card-bg );
+	border-radius: var( --ce-card-radius );
+	box-shadow: var( --ce-card-shadow );
+	overflow: hidden;
+	transition: transform var( --ce-transition ), box-shadow var( --ce-transition );
+	cursor: pointer;
+}
+
+.ce-event-card:hover {
+	transform: translateY( -2px );
+	box-shadow: 0 6px 20px rgba( 0, 0, 0, 0.12 );
+}
+
+/* Featured image */
+.ce-card-image {
+	position: relative;
+	overflow: hidden;
+	padding-top: var( --ce-image-ratio );
+}
+
+.ce-card-image img {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+}
+
+.ce-card-no-image {
+	position: relative;
+	padding-top: var( --ce-image-ratio );
+	background: var( --ce-primary );
+}
+
+/* Card body */
+.ce-card-body {
+	padding: var( --ce-card-padding );
+}
+
+.ce-card-title {
+	font-size: var( --ce-font-size-title );
+	font-weight: 600;
+	color: var( --ce-primary );
+	margin: 0 0 0.5rem;
+	line-height: 1.3;
+}
+
+.ce-card-meta {
+	font-size: var( --ce-font-size-meta );
+	color: var( --ce-muted );
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem 1rem;
+	margin-bottom: 0.75rem;
+}
+
+.ce-card-meta-item {
+	display: flex;
+	align-items: center;
+	gap: 0.3rem;
+}
+
+.ce-card-excerpt {
+	font-size: var( --ce-font-size-meta );
+	color: var( --ce-text );
+	margin: 0 0 1rem;
+}
+
+.ce-card-categories {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.4rem;
+	margin-bottom: 0.75rem;
+}
+
+.ce-category-tag {
+	display: inline-block;
+	padding: 0.2rem 0.6rem;
+	font-size: 0.75rem;
+	border-radius: 100px;
+	background: var( --ce-accent );
+	color: #ffffff;
+	text-decoration: none;
+}
+
+.ce-card-booking {
+	margin-top: auto;
+}
+
+/* -------------------------------------------------------------------------
+   Hover Preview Popover
+   ------------------------------------------------------------------------- */
+
+.ce-hover-preview {
+	position: absolute;
+	z-index: 1000;
+	background: #ffffff;
+	border: 1px solid var( --ce-border-color );
+	border-radius: var( --ce-card-radius );
+	box-shadow: 0 4px 16px rgba( 0, 0, 0, 0.15 );
+	padding: 1rem;
+	max-width: 280px;
+	pointer-events: none;
+	opacity: 0;
+	transform: translateY( 4px );
+	transition: opacity var( --ce-transition ), transform var( --ce-transition );
+}
+
+.ce-hover-preview.is-visible {
+	opacity: 1;
+	transform: translateY( 0 );
+}
+
+.ce-hover-preview-title {
+	font-size: var( --ce-font-size-meta );
+	font-weight: 600;
+	color: var( --ce-primary );
+	margin: 0 0 0.4rem;
+}
+
+.ce-hover-preview-meta {
+	font-size: 0.8rem;
+	color: var( --ce-muted );
+}
+
+/* -------------------------------------------------------------------------
+   Modal
+   ------------------------------------------------------------------------- */
+
+.ce-modal-overlay {
+	position: fixed;
+	inset: 0;
+	background: var( --ce-modal-overlay );
+	z-index: 9998;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 1rem;
+	opacity: 0;
+	transition: opacity var( --ce-transition );
+}
+
+.ce-modal-overlay.is-open {
+	opacity: 1;
+}
+
+.ce-modal {
+	background: #ffffff;
+	border-radius: var( --ce-modal-radius );
+	width: 100%;
+	max-width: var( --ce-modal-max-width );
+	max-height: 90vh;
+	overflow-y: auto;
+	position: relative;
+	transform: translateY( 16px );
+	transition: transform var( --ce-transition );
+	z-index: 9999;
+}
+
+.ce-modal-overlay.is-open .ce-modal {
+	transform: translateY( 0 );
+}
+
+.ce-modal-close {
+	position: absolute;
+	top: 1rem;
+	right: 1rem;
+	background: none;
+	border: none;
+	font-size: 1.5rem;
+	line-height: 1;
+	cursor: pointer;
+	color: var( --ce-muted );
+	padding: 0.25rem;
+	border-radius: 50%;
+	transition: color var( --ce-transition );
+}
+
+.ce-modal-close:hover {
+	color: var( --ce-primary );
+}
+
+.ce-modal-image {
+	border-radius: var( --ce-modal-radius ) var( --ce-modal-radius ) 0 0;
+	overflow: hidden;
+}
+
+.ce-modal-image img {
+	width: 100%;
+	display: block;
+}
+
+.ce-modal-body {
+	padding: 1.5rem;
+}
+
+.ce-modal-title {
+	font-size: 1.25rem;
+	font-weight: 700;
+	color: var( --ce-primary );
+	margin: 0 0 0.75rem;
+}
+
+.ce-modal-meta {
+	font-size: var( --ce-font-size-meta );
+	color: var( --ce-muted );
+	margin-bottom: 1rem;
+}
+
+.ce-modal-description {
+	font-size: var( --ce-font-size-body );
+	color: var( --ce-text );
+	line-height: var( --ce-line-height );
+	margin-bottom: 1.25rem;
+}
+
+/* -------------------------------------------------------------------------
+   Loading / empty states
+   ------------------------------------------------------------------------- */
+
+.ce-loading,
+.ce-no-events {
+	text-align: center;
+	padding: 3rem 1rem;
+	color: var( --ce-muted );
+	font-size: var( --ce-font-size-meta );
+}
+
+.ce-loading::before {
+	content: '';
+	display: block;
+	width: 32px;
+	height: 32px;
+	border: 3px solid var( --ce-border-color );
+	border-top-color: var( --ce-primary );
+	border-radius: 50%;
+	animation: ce-spin 0.8s linear infinite;
+	margin: 0 auto 0.75rem;
+}
+
+@keyframes ce-spin {
+	to { transform: rotate( 360deg ); }
+}
+
+/* -------------------------------------------------------------------------
+   Responsive
+   ------------------------------------------------------------------------- */
+
+@media ( max-width: 768px ) {
+
+	.ce-events-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.ce-toolbar {
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.ce-filters {
+		flex-direction: column;
+	}
+
+	.ce-filter-select,
+	.ce-filter-search {
+		width: 100%;
+	}
+}

@@ -1,0 +1,93 @@
+/* Church Events — Admin Styles */
+
+.ce-settings-wrap {
+	max-width: 960px;
+}
+
+.ce-settings-wrap .nav-tab-wrapper {
+	margin-bottom: 0;
+}
+
+.ce-tab-content {
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	border-top: none;
+	padding: 24px;
+}
+
+/* Fields tab — two column layout */
+.ce-fields-columns {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 32px;
+}
+
+.ce-fields-column h3 {
+	margin-top: 0;
+	padding-bottom: 8px;
+	border-bottom: 1px solid #dcdcde;
+}
+
+/* Sortable field rows */
+.ce-sortable-fields {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.ce-field-row {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 10px 12px;
+	margin-bottom: 4px;
+	background: #f9f9f9;
+	border: 1px solid #dcdcde;
+	border-radius: 4px;
+	cursor: default;
+}
+
+.ce-field-row:hover {
+	background: #f0f0f1;
+}
+
+.ce-drag-handle {
+	color: #a7aaad;
+	cursor: grab;
+	flex-shrink: 0;
+}
+
+.ce-drag-handle:active {
+	cursor: grabbing;
+}
+
+.ce-field-row label {
+	flex: 1;
+	font-weight: normal;
+	cursor: pointer;
+}
+
+.ce-field-row.ui-sortable-helper {
+	background: #fff;
+	box-shadow: 0 4px 12px rgba(0,0,0,.15);
+	border-color: #2271b1;
+}
+
+/* Sync status */
+#ce-sync-status {
+	font-style: italic;
+	color: #646970;
+}
+
+#ce-sync-status.success {
+	color: #00a32a;
+}
+
+#ce-sync-status.error {
+	color: #d63638;
+}
+
+/* Colour reference table */
+.ce-settings-wrap .widefat code {
+	font-size: 12px;
+}
