@@ -19,6 +19,13 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @return array
  */
 function ce_rest_event_query( $args, $request ) {
+	// Store request params on args so we can build a cache key later
+	$args['_ce_cache_key_params'] = array(
+		'cal_after'      => $request->get_param( 'cal_after' ),
+		'cal_before'     => $request->get_param( 'cal_before' ),
+		'event_category' => $request->get_param( 'event_category' ),
+		'event_search'   => $request->get_param( 'event_search' ),
+	);
 
 	$cal_after  = $request->get_param( 'cal_after' );
 	$cal_before = $request->get_param( 'cal_before' );
@@ -153,3 +160,97 @@ function ce_image_ratio_to_size( $ratio ) {
 	);
 	return isset( $map[ $ratio ] ) ? $map[ $ratio ] : 'large';
 }
+
+/**
+ * Cache event REST responses as transients.
+ * Hooked to rest_post_dispatch to cache after the response is built.
+ */
+function ce_cache_rest_response( $response, $server, $request ) {
+	if ( ! $request instanceof WP_REST_Request ) return $response;
+	if ( strpos( $request->get_route(), '/wp/v2/events' ) === false ) return $response;
+	if ( $request->get_method() !== 'GET' ) return $response;
+
+	$key = ce_rest_cache_key( $request );
+	if ( ! $key ) return $response;
+
+	// Only cache if not already cached
+	if ( false === get_transient( $key ) ) {
+		set_transient( $key, array(
+			'data'    => $response->get_data(),
+			'headers' => $response->get_headers(),
+			'status'  => $response->get_status(),
+		), 12 * HOUR_IN_SECONDS );
+
+		// Track cache keys so we can clear them all on sync
+		$keys   = get_option( 'ce_rest_cache_keys', array() );
+		$keys[] = $key;
+		$keys   = array_unique( array_slice( $keys, -200 ) ); // keep last 200
+		update_option( 'ce_rest_cache_keys', $keys, false );
+	}
+
+	return $response;
+}
+add_filter( 'rest_post_dispatch', 'ce_cache_rest_response', 10, 3 );
+
+/**
+ * Serve cached REST responses before hitting the database.
+ */
+function ce_serve_cached_rest_response( $response, $handler, $request ) {
+	if ( ! $request instanceof WP_REST_Request ) return $response;
+	if ( strpos( $request->get_route(), '/wp/v2/events' ) === false ) return $response;
+	if ( $request->get_method() !== 'GET' ) return $response;
+
+	$key    = ce_rest_cache_key( $request );
+	$cached = $key ? get_transient( $key ) : false;
+
+	if ( $cached ) {
+		$res = new WP_REST_Response( $cached['data'], $cached['status'] );
+		foreach ( $cached['headers'] as $header => $value ) {
+			$res->header( $header, $value );
+		}
+		$res->header( 'X-CE-Cache', 'HIT' );
+		return $res;
+	}
+
+	return $response;
+}
+add_filter( 'rest_pre_dispatch', 'ce_serve_cached_rest_response', 10, 3 );
+
+/**
+ * Build a cache key from request parameters.
+ *
+ * @param WP_REST_Request $request
+ * @return string|false
+ */
+function ce_rest_cache_key( $request ) {
+	$after    = $request->get_param( 'cal_after' );
+	$before   = $request->get_param( 'cal_before' );
+	if ( ! $after || ! $before ) return false;
+
+	$parts = array(
+		'ce_events',
+		$after,
+		$before,
+		$request->get_param( 'event_category' ) ?: 'all',
+		$request->get_param( 'event_search' )   ?: 'none',
+		$request->get_param( 'page' )            ?: '1',
+		$request->get_param( 'per_page' )        ?: '100',
+	);
+
+	return 'ce_rest_' . md5( implode( '_', $parts ) );
+}
+
+/**
+ * Clear all event REST cache transients.
+ * Called after every sync and when settings change.
+ */
+function ce_clear_rest_cache() {
+	$keys = get_option( 'ce_rest_cache_keys', array() );
+	foreach ( $keys as $key ) {
+		delete_transient( $key );
+	}
+	delete_option( 'ce_rest_cache_keys' );
+}
+add_action( 'ce_churchsuite_sync', 'ce_clear_rest_cache', 5 ); // Before sync runs
+add_action( 'ce_manual_sync',      'ce_clear_rest_cache', 5 );
+add_action( 'ce_settings_saved',   'ce_clear_rest_cache' );
