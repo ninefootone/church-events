@@ -123,9 +123,15 @@ function ce_run_churchsuite_import() {
 		return array( 'imported' => 0, 'updated' => 0, 'skipped' => 0, 'errors' => 1 );
 	}
 
-	$counts = array( 'imported' => 0, 'updated' => 0, 'skipped' => 0, 'errors' => 0 );
+	$counts = array( 'imported' => 0, 'updated' => 0, 'skipped' => 0, 'errors' => 0, 'trashed' => 0 );
+
+	// Build a list of identifiers present in the feed
+	$feed_identifiers = array();
 
 	foreach ( $events as $event ) {
+		if ( ! empty( $event['identifier'] ) ) {
+			$feed_identifiers[] = $event['identifier'];
+		}
 		$result = ce_upsert_churchsuite_event( $event );
 		if ( is_wp_error( $result ) ) {
 			$counts['errors']++;
@@ -139,9 +145,13 @@ function ce_run_churchsuite_import() {
 		}
 	}
 
+	// Trash any WordPress events from ChurchSuite that are no longer in the feed
+	$trashed = ce_trash_removed_events( $feed_identifiers );
+	$counts['trashed'] = $trashed;
+
 	$summary = sprintf(
-		'ChurchSuite import complete. Imported: %d, Updated: %d, Skipped: %d, Errors: %d',
-		$counts['imported'], $counts['updated'], $counts['skipped'], $counts['errors']
+		'ChurchSuite import complete. Imported: %d, Updated: %d, Skipped: %d, Trashed: %d, Errors: %d',
+		$counts['imported'], $counts['updated'], $counts['skipped'], $counts['trashed'], $counts['errors']
 	);
 
 	ce_log( $summary );
@@ -502,6 +512,50 @@ function ce_set_featured_image( $post_id, $image_url, $identifier ) {
 	if ( $old_thumb && $old_thumb !== $attachment_id ) {
 		wp_delete_attachment( $old_thumb, true );
 	}
+}
+
+/**
+ * Trash WordPress event posts that are no longer in the ChurchSuite feed.
+ * Only affects posts with event_source = 'churchsuite'.
+ *
+ * @param array $feed_identifiers  List of identifier slugs present in the feed
+ * @return int  Number of posts trashed
+ */
+function ce_trash_removed_events( $feed_identifiers ) {
+	if ( empty( $feed_identifiers ) ) return 0;
+
+	// Get all WordPress events sourced from ChurchSuite
+	$existing_posts = get_posts( array(
+		'post_type'      => 'event',
+		'post_status'    => 'publish',
+		'posts_per_page' => -1,
+		'meta_query'     => array(
+			array(
+				'key'   => 'event_source',
+				'value' => 'churchsuite',
+			),
+		),
+		'fields' => 'ids',
+	) );
+
+	if ( empty( $existing_posts ) ) return 0;
+
+	$trashed = 0;
+
+	foreach ( $existing_posts as $post_id ) {
+		$identifier = get_post_meta( $post_id, 'event_churchsuite_id', true );
+
+		// Also check legacy numeric ID posts that haven't been re-imported yet
+		if ( empty( $identifier ) ) continue;
+
+		if ( ! in_array( $identifier, $feed_identifiers, true ) ) {
+			wp_trash_post( $post_id );
+			ce_log( 'Trashed event no longer in ChurchSuite feed: ' . get_the_title( $post_id ) . ' (' . $identifier . ')' );
+			$trashed++;
+		}
+	}
+
+	return $trashed;
 }
 
 /**
