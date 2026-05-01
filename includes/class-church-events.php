@@ -44,6 +44,7 @@ class Church_Events {
 		require_once CE_PLUGIN_DIR . 'includes/cpt.php';
 		require_once CE_PLUGIN_DIR . 'includes/meta.php';
 		require_once CE_PLUGIN_DIR . 'includes/rest-api.php';
+		require_once CE_PLUGIN_DIR . 'includes/shortcodes.php';
 		require_once CE_PLUGIN_DIR . 'admin/settings.php';
 		require_once CE_PLUGIN_DIR . 'admin/ajax.php';
 	}

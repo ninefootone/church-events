@@ -441,3 +441,155 @@
 		width: 100%;
 	}
 }
+
+/* -------------------------------------------------------------------------
+   View visibility
+   ------------------------------------------------------------------------- */
+
+.ce-view {
+	display: none;
+}
+
+.ce-view.is-active {
+	display: block;
+}
+
+/* -------------------------------------------------------------------------
+   FullCalendar overrides
+   All scoped — no !important needed as these are more specific than FC defaults
+   ------------------------------------------------------------------------- */
+
+.church-events .fc {
+	font-family: inherit;
+	font-size: var( --ce-font-size-body );
+	color: var( --ce-text );
+}
+
+.church-events .fc .fc-toolbar-title {
+	font-size: 1.1rem;
+	font-weight: 600;
+	color: var( --ce-primary );
+}
+
+.church-events .fc .fc-button {
+	background:    var( --ce-primary );
+	border-color:  var( --ce-primary );
+	border-radius: var( --ce-btn-radius );
+	font-size:     var( --ce-btn-font-size );
+	padding:       0.35rem 0.75rem;
+	transition:    background var( --ce-transition ), border-color var( --ce-transition );
+}
+
+.church-events .fc .fc-button:hover,
+.church-events .fc .fc-button:focus {
+	background:   var( --ce-secondary );
+	border-color: var( --ce-secondary );
+	outline:      none;
+}
+
+.church-events .fc .fc-button:focus-visible {
+	outline:        2px solid var( --ce-secondary );
+	outline-offset: 2px;
+}
+
+.church-events .fc .fc-button-primary:not(:disabled).fc-button-active {
+	background:   var( --ce-secondary );
+	border-color: var( --ce-secondary );
+}
+
+.church-events .fc .fc-col-header-cell {
+	background:  var( --ce-primary );
+	color:       #ffffff;
+	font-weight: 500;
+	font-size:   var( --ce-font-size-meta );
+	padding:     0.4rem 0;
+}
+
+.church-events .fc .fc-col-header-cell a {
+	color: #ffffff;
+	text-decoration: none;
+}
+
+.church-events .fc .fc-daygrid-day-number {
+	font-size:   var( --ce-font-size-meta );
+	color:       var( --ce-text );
+	padding:     0.25rem 0.5rem;
+	text-decoration: none;
+}
+
+.church-events .fc .fc-day-today {
+	background: rgba( 0, 0, 0, 0.03 );
+}
+
+.church-events .fc .fc-day-today .fc-daygrid-day-number {
+	background:    var( --ce-accent );
+	color:         #ffffff;
+	border-radius: 50%;
+	width:         1.75rem;
+	height:        1.75rem;
+	display:       flex;
+	align-items:   center;
+	justify-content: center;
+	padding:       0;
+}
+
+/* Event chips */
+.church-events .fc .fc-daygrid-event {
+	background:    var( --ce-secondary );
+	border-color:  var( --ce-secondary );
+	border-radius: 3px;
+	font-size:     0.75rem;
+	padding:       1px 4px;
+	cursor:        pointer;
+	transition:    background var( --ce-transition );
+}
+
+.church-events .fc .fc-daygrid-event:hover {
+	background:   var( --ce-primary );
+	border-color: var( --ce-primary );
+}
+
+.church-events .fc .fc-daygrid-event .fc-event-title {
+	font-weight: 500;
+}
+
+/* Custom event content */
+.ce-fc-event {
+	display:     flex;
+	align-items: baseline;
+	gap:         0.25rem;
+	overflow:    hidden;
+}
+
+.ce-fc-time {
+	font-size:   0.7rem;
+	opacity:     0.85;
+	flex-shrink: 0;
+}
+
+.ce-fc-title {
+	overflow:      hidden;
+	text-overflow: ellipsis;
+	white-space:   nowrap;
+}
+
+/* Remove the bottom colour strip issue */
+.church-events .fc .fc-scrollgrid {
+	border-bottom-color: var( --ce-border-color );
+}
+
+.church-events .fc-theme-standard td,
+.church-events .fc-theme-standard th {
+	border-color: var( --ce-border-color );
+}
+
+.church-events .fc .fc-scrollgrid-section-liquid > td {
+	border-bottom: none;
+}
+
+/* Modal footer */
+.ce-modal-footer {
+	padding-top: 1rem;
+	border-top:  1px solid var( --ce-border-color );
+	margin-top:  1rem;
+}
