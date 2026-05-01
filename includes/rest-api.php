@@ -162,87 +162,57 @@ function ce_image_ratio_to_size( $ratio ) {
 }
 
 /**
- * Cache event REST responses as transients.
- * Hooked to rest_post_dispatch to cache after the response is built.
+ * Cache event REST responses using transients.
+ * Hooks into rest_pre_echo_response which fires reliably after routing.
  */
-function ce_cache_rest_response( $response, $server, $request ) {
-	if ( ! $request instanceof WP_REST_Request ) return $response;
-	if ( strpos( $request->get_route(), '/wp/v2/events' ) === false ) return $response;
-	if ( $request->get_method() !== 'GET' ) return $response;
+function ce_maybe_serve_cached_response() {
+	// Only handle event REST requests
+	if ( ! defined( 'REST_REQUEST' ) || ! REST_REQUEST ) return;
 
-	$key = ce_rest_cache_key( $request );
-	if ( ! $key ) return $response;
+	$route = $GLOBALS['wp']->query_vars['rest_route'] ?? '';
+	if ( strpos( $route, '/wp/v2/events' ) === false ) return;
+	if ( $_SERVER['REQUEST_METHOD'] !== 'GET' ) return;
 
-	// Only cache if not already cached
-	if ( false === get_transient( $key ) ) {
-		set_transient( $key, array(
-			'data'    => $response->get_data(),
-			'headers' => $response->get_headers(),
-			'status'  => $response->get_status(),
-		), 12 * HOUR_IN_SECONDS );
+	// Build cache key from query string
+	$params = $_GET;
+	unset( $params['_wpnonce'] );
+	ksort( $params );
+	$key    = 'ce_rest_' . md5( http_build_query( $params ) );
 
-		// Track cache keys so we can clear them all on sync
-		$keys   = get_option( 'ce_rest_cache_keys', array() );
+	// Store key for later cache clearing
+	$keys   = get_option( 'ce_rest_cache_keys', array() );
+	if ( ! in_array( $key, $keys ) ) {
 		$keys[] = $key;
-		$keys   = array_unique( array_slice( $keys, -200 ) ); // keep last 200
+		$keys   = array_slice( $keys, -200 );
 		update_option( 'ce_rest_cache_keys', $keys, false );
 	}
 
-	return $response;
-}
-add_filter( 'rest_post_dispatch', 'ce_cache_rest_response', 10, 3 );
-
-/**
- * Serve cached REST responses before hitting the database.
- */
-function ce_serve_cached_rest_response( $response, $handler, $request ) {
-	if ( ! $request instanceof WP_REST_Request ) return $response;
-	if ( strpos( $request->get_route(), '/wp/v2/events' ) === false ) return $response;
-	if ( $request->get_method() !== 'GET' ) return $response;
-
-	$key    = ce_rest_cache_key( $request );
-	$cached = $key ? get_transient( $key ) : false;
-
-	if ( $cached ) {
-		$res = new WP_REST_Response( $cached['data'], $cached['status'] );
-		foreach ( $cached['headers'] as $header => $value ) {
-			$res->header( $header, $value );
-		}
-		$res->header( 'X-CE-Cache', 'HIT' );
-		return $res;
+	// Serve from cache if available
+	$cached = get_transient( $key );
+	if ( $cached !== false ) {
+		header( 'X-CE-Cache: HIT' );
+		header( 'Content-Type: application/json; charset=UTF-8' );
+		header( 'X-WP-Total: ' . $cached['total'] );
+		header( 'X-WP-TotalPages: ' . $cached['total_pages'] );
+		echo wp_json_encode( $cached['data'] );
+		exit;
 	}
 
-	return $response;
+	// Not cached — store after response is sent
+	add_filter( 'rest_post_dispatch', function( $response ) use ( $key ) {
+		if ( is_wp_error( $response ) ) return $response;
+		set_transient( $key, array(
+			'data'        => $response->get_data(),
+			'total'       => $response->get_headers()['X-WP-Total'] ?? 0,
+			'total_pages' => $response->get_headers()['X-WP-TotalPages'] ?? 0,
+		), 12 * HOUR_IN_SECONDS );
+		return $response;
+	}, 10, 1 );
 }
-add_filter( 'rest_pre_dispatch', 'ce_serve_cached_rest_response', 10, 3 );
-
-/**
- * Build a cache key from request parameters.
- *
- * @param WP_REST_Request $request
- * @return string|false
- */
-function ce_rest_cache_key( $request ) {
-	$after    = $request->get_param( 'cal_after' );
-	$before   = $request->get_param( 'cal_before' );
-	if ( ! $after || ! $before ) return false;
-
-	$parts = array(
-		'ce_events',
-		$after,
-		$before,
-		$request->get_param( 'event_category' ) ?: 'all',
-		$request->get_param( 'event_search' )   ?: 'none',
-		$request->get_param( 'page' )            ?: '1',
-		$request->get_param( 'per_page' )        ?: '100',
-	);
-
-	return 'ce_rest_' . md5( implode( '_', $parts ) );
-}
+add_action( 'rest_api_init', 'ce_maybe_serve_cached_response', 5 );
 
 /**
  * Clear all event REST cache transients.
- * Called after every sync and when settings change.
  */
 function ce_clear_rest_cache() {
 	$keys = get_option( 'ce_rest_cache_keys', array() );
@@ -251,6 +221,6 @@ function ce_clear_rest_cache() {
 	}
 	delete_option( 'ce_rest_cache_keys' );
 }
-add_action( 'ce_churchsuite_sync', 'ce_clear_rest_cache', 5 ); // Before sync runs
+add_action( 'ce_churchsuite_sync', 'ce_clear_rest_cache', 5 );
 add_action( 'ce_manual_sync',      'ce_clear_rest_cache', 5 );
 add_action( 'ce_settings_saved',   'ce_clear_rest_cache' );
