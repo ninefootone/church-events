@@ -79,6 +79,10 @@ class Church_Events {
 		ce_register_cpt();
 		flush_rewrite_rules();
 		ce_add_meta_indexes();
+		// Only set default options if none exist yet — prevents wipe on update
+		if ( ! get_option( 'ce_settings' ) ) {
+			add_option( 'ce_settings', array() );
+		}
 	}
 
 	/**
