@@ -221,7 +221,7 @@ function ce_upsert_churchsuite_event( $cs ) {
 	$action     = 'imported';
 
 	// Check if post already exists by ChurchSuite identifier
-	$existing = ce_get_post_by_churchsuite_id( $identifier );
+	$existing = ce_get_post_by_churchsuite_id( $identifier, $cs['id'] ?? null );
 	$post_id  = $existing ? $existing->ID : 0;
 
 	// ---------------------------------------------------------------------------
@@ -338,7 +338,8 @@ function ce_upsert_churchsuite_event( $cs ) {
 		'event_address'              => $location_addr,
 		'event_map_address'          => $map_address,
 		'event_booking_url'          => $signup_enabled === '1' ? $booking_url : '',
-		'event_booking_text'         => $signup_enabled === '1' ? $booking_text : '',
+        'event_booking_text'         => $signup_enabled === '1' ? $booking_text : '',
+        'event_signup_link'          => $signup_enabled === '1' ? $booking_url : '', // Legacy ACF field compat
 		'event_signup_enabled'       => $signup_enabled,
 		'event_source'               => 'churchsuite',
 		'event_source_id'            => $identifier,
@@ -389,7 +390,9 @@ function ce_upsert_churchsuite_event( $cs ) {
  * @param string $identifier
  * @return WP_Post|null
  */
-function ce_get_post_by_churchsuite_id( $identifier ) {
+function ce_get_post_by_churchsuite_id( $identifier, $numeric_id = null ) {
+
+	// First check new-style meta key (plugin imports)
 	$posts = get_posts( array(
 		'post_type'      => 'event',
 		'post_status'    => 'any',
@@ -402,7 +405,26 @@ function ce_get_post_by_churchsuite_id( $identifier ) {
 		),
 	) );
 
-	return ! empty( $posts ) ? $posts[0] : null;
+	if ( ! empty( $posts ) ) return $posts[0];
+
+	// Fall back to old ACF-style numeric ID (WPAllImport legacy posts)
+	if ( $numeric_id ) {
+		$posts = get_posts( array(
+			'post_type'      => 'event',
+			'post_status'    => 'any',
+			'posts_per_page' => 1,
+			'meta_query'     => array(
+				array(
+					'key'   => 'event_id',
+					'value' => $numeric_id,
+				),
+			),
+		) );
+
+		if ( ! empty( $posts ) ) return $posts[0];
+	}
+
+	return null;
 }
 
 /**
