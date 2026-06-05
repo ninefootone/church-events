@@ -2,6 +2,11 @@
 
 All notable changes to Church Events are documented here.
 
+## [1.6.1] - 2026-06-05
+
+### Fixed
+- Removed tracked `.DS_Store` files from repository and added macOS metadata files to `.gitignore`.
+
 ## [1.6.0] - 2026-06-05
 
 ### Added
