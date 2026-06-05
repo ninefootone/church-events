@@ -49,3 +49,7 @@ wp-config.php
 
 # PUC vendored dependency — exclude its own git history from the repo
 lib/**/.git
+
+# macOS metadata — exclude from repo
+.DS_Store
+**/.DS_Store
