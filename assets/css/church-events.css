@@ -1,0 +1,835 @@
+/**
+ * Church Events — Frontend Styles
+ *
+ * All rules are scoped under .church-events to avoid conflicts.
+ * Override using CSS custom properties — no !important needed.
+ *
+ * Elementor sites: map to global colour variables in your
+ * custom CSS or via Events → Settings → Styling:
+ *
+ *   .church-events {
+ *     --ce-primary: var(--e-global-color-primary);
+ *     --ce-secondary: var(--e-global-color-secondary);
+ *     --ce-text: var(--e-global-color-text);
+ *     --ce-accent: var(--e-global-color-accent);
+ *   }
+ */
+
+/* -------------------------------------------------------------------------
+   Custom Properties (design tokens)
+   ------------------------------------------------------------------------- */
+
+.church-events {
+
+	/* Colours — set from plugin settings, overrideable via CSS */
+	--ce-primary:         #083C5E;
+	--ce-secondary:       #35878C;
+	--ce-text:            #333333;
+	--ce-accent:          #C1789C;
+	--ce-bg:              transparent;
+	--ce-card-bg:         #ffffff;
+	--ce-border-color:    #e0e0e0;
+	--ce-muted:           #666666;
+
+	/* Typography */
+	--ce-font-size-title: 1.125rem;
+	--ce-font-size-meta:  0.875rem;
+	--ce-font-size-body:  1rem;
+	--ce-line-height:     1.6;
+
+	/* Cards */
+	--ce-card-radius:     6px;
+	--ce-card-gap:        1.5rem;
+	--ce-card-shadow:     0 2px 8px rgba(0, 0, 0, 0.08);
+	--ce-card-padding:    1.25rem;
+
+	/* Image ratios */
+	--ce-image-ratio:     56.25%; /* 16:9 default — overridden by PHP */
+
+	/* Calendar */
+	--ce-calendar-height: 650px;
+
+	/* Modal */
+	--ce-modal-max-width: 640px;
+	--ce-modal-overlay:   rgba(0, 0, 0, 0.6);
+	--ce-modal-radius:    8px;
+
+	/* Buttons */
+	--ce-btn-radius:      4px;
+	--ce-btn-padding:     0.5rem 1.25rem;
+	--ce-btn-font-size:   0.9rem;
+
+	/* Transitions */
+	--ce-transition:      0.2s ease;
+
+	/* Layout */
+	background: var( --ce-bg );
+	color: var( --ce-text );
+	font-size: var( --ce-font-size-body );
+	line-height: var( --ce-line-height );
+	box-sizing: border-box;
+}
+
+.church-events *,
+.church-events *::before,
+.church-events *::after {
+	box-sizing: inherit;
+}
+
+/* -------------------------------------------------------------------------
+   Toolbar (view toggle + filters)
+   ------------------------------------------------------------------------- */
+
+.ce-toolbar {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+	margin-bottom: 1.5rem;
+}
+
+.ce-filters-bar {
+	/* Add padding, background, border-radius here as needed */
+}
+
+.ce-filters {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.75rem;
+}
+
+.ce-view-toggle {
+	display: flex;
+	gap: 0.5rem;
+}
+
+.ce-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	padding: var( --ce-btn-padding );
+	font-size: var( --ce-btn-font-size );
+	border-radius: var( --ce-btn-radius );
+	border: 2px solid var( --ce-primary );
+	background: transparent;
+	color: var( --ce-primary );
+	cursor: pointer;
+	transition: background var( --ce-transition ), color var( --ce-transition );
+	text-decoration: none;
+	line-height: 1;
+}
+
+.ce-btn:hover,
+.ce-btn.is-active {
+	background: var( --ce-primary );
+	color: #ffffff;
+}
+
+.church-events .ce-btn-primary {
+	background: var( --ce-primary );
+	color: #ffffff;
+	font-weight: 700;
+}
+
+.church-events .ce-btn-primary:hover {
+	background: var( --ce-secondary );
+	border-color: var( --ce-secondary );
+	color: #ffffff;
+}
+
+/* Filter bar */
+.ce-filters {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.75rem;
+}
+
+.church-events .ce-filter-select,
+.church-events .ce-filter-category,
+.church-events .ce-filter-site,
+.church-events .ce-filter-month,
+.church-events .ce-filter-search,
+.church-events .ce-filter-date-from,
+.church-events .ce-filter-date-to {
+	padding: 0.45rem 0.75rem;
+	font-size: var( --ce-font-size-meta );
+	border: 1px solid var( --ce-border-color );
+	border-radius: var( --ce-btn-radius );
+	background: #ffffff;
+	color: var( --ce-text );
+}
+
+.church-events .ce-filter-search {
+	flex: 0 0 100%;
+}
+
+.church-events .ce-filter-category,
+.church-events .ce-filter-site,
+.church-events .ce-filter-month {
+	flex: 1 1 0;
+}
+
+.church-events .ce-filter-date-from,
+.church-events .ce-filter-date-to {
+	flex: 2 1 0;
+}
+
+.ce-filter-select:focus,
+.ce-filter-search:focus {
+	outline: 2px solid var( --ce-secondary );
+	outline-offset: 2px;
+	border-color: var( --ce-secondary );
+}
+
+/* -------------------------------------------------------------------------
+   Grid / List layout
+   ------------------------------------------------------------------------- */
+
+.ce-events-grid {
+	display: grid;
+	grid-template-columns: repeat( var( --ce-columns, 3 ), 1fr );
+	gap: var( --ce-card-gap );
+}
+
+.ce-events-list {
+	display: flex;
+	flex-direction: column;
+	gap: var( --ce-card-gap );
+}
+
+/* -------------------------------------------------------------------------
+   Event Card
+   ------------------------------------------------------------------------- */
+
+.ce-event-card {
+	background: var( --ce-card-bg );
+	border-radius: var( --ce-card-radius );
+	box-shadow: var( --ce-card-shadow );
+	overflow: hidden;
+	transition: transform var( --ce-transition ), box-shadow var( --ce-transition );
+	cursor: pointer;
+}
+
+.ce-event-card:hover {
+	transform: translateY( -2px );
+	box-shadow: 0 6px 20px rgba( 0, 0, 0, 0.12 );
+}
+
+/* Featured image */
+.ce-card-image {
+	position: relative;
+	overflow: hidden;
+	padding-top: var( --ce-image-ratio );
+}
+
+.ce-card-image img {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+}
+
+.ce-card-no-image {
+	position: relative;
+	padding-top: var( --ce-image-ratio );
+	background: var( --ce-primary );
+}
+
+/* Card body */
+.ce-card-body {
+	padding: var( --ce-card-padding );
+}
+
+.ce-card-title {
+	font-size: var( --ce-font-size-title );
+	font-weight: 600;
+	color: var( --ce-primary );
+	margin: 0 0 0.5rem;
+	line-height: 1.3;
+}
+
+.ce-card-meta {
+	font-size: var( --ce-font-size-meta );
+	color: var( --ce-muted );
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem 1rem;
+	margin-bottom: 0.75rem;
+}
+
+.ce-card-meta-item {
+	display: flex;
+	align-items: center;
+	gap: 0.3rem;
+}
+
+.ce-card-excerpt {
+	font-size: var( --ce-font-size-meta );
+	color: var( --ce-text );
+	margin: 0 0 1rem;
+}
+
+.ce-card-categories {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.4rem;
+	margin-bottom: 0.75rem;
+}
+
+.ce-category-tag {
+	display: inline-block;
+	padding: 0.2rem 0.6rem;
+	font-size: 0.75rem;
+	border-radius: 100px;
+	background: var( --ce-accent );
+	color: #ffffff;
+	text-decoration: none;
+}
+
+.ce-card-booking {
+	margin-top: auto;
+}
+
+/* -------------------------------------------------------------------------
+   Hover Preview Popover
+   ------------------------------------------------------------------------- */
+
+.ce-hover-preview {
+	position: fixed;
+	z-index: 9999;
+	background: #ffffff;
+	border: 1px solid var( --ce-border-color );
+	border-radius: var( --ce-card-radius );
+	box-shadow: 0 4px 16px rgba( 0, 0, 0, 0.15 );
+	padding: 1rem;
+	max-width: 280px;
+	pointer-events: none;
+	opacity: 0;
+	transform: translateY( 4px );
+	transition: opacity var( --ce-transition ), transform var( --ce-transition );
+}
+
+.ce-hover-preview.is-visible {
+	opacity: 1;
+	transform: translateY( 0 );
+}
+
+.ce-hover-preview-title {
+	font-size: var( --ce-font-size-meta );
+	font-weight: 600;
+	color: var( --ce-primary );
+	margin: 0 0 0.4rem;
+}
+
+.ce-hover-preview-meta {
+	font-size: 0.8rem;
+	color: var( --ce-muted );
+}
+
+/* -------------------------------------------------------------------------
+   Modal
+   ------------------------------------------------------------------------- */
+
+.ce-modal-overlay {
+	position: fixed;
+	inset: 0;
+	background: var( --ce-modal-overlay );
+	z-index: 9998;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 1rem;
+	opacity: 0;
+	transition: opacity var( --ce-transition );
+}
+
+.ce-modal-overlay.is-open {
+	opacity: 1;
+}
+
+.ce-modal {
+	background: #ffffff;
+	border-radius: var( --ce-modal-radius );
+	width: 100%;
+	max-width: var( --ce-modal-max-width );
+	max-height: 90vh;
+	overflow-y: auto;
+	position: relative;
+	transform: translateY( 16px );
+	transition: transform var( --ce-transition );
+	z-index: 9999;
+}
+
+.ce-modal-overlay.is-open .ce-modal {
+	transform: translateY( 0 );
+}
+
+.church-events .ce-modal-close {
+	position: absolute;
+	top: 1rem;
+	right: 1rem;
+	background: var( --ce-primary );
+	border: none;
+	outline: none;
+	font-size: 1.5rem;
+	line-height: 1;
+	cursor: pointer;
+	color: #ffffff;
+	padding: 0;
+	border-radius: 50%;
+	width: 2rem;
+	height: 2rem;
+	min-width: 2rem;
+	min-height: 2rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: color var( --ce-transition );
+}
+
+.church-events .ce-modal-close:hover {
+	background: var( --ce-secondary );
+	color: #ffffff;
+}
+
+.ce-modal-image {
+	border-radius: var( --ce-modal-radius ) var( --ce-modal-radius ) 0 0;
+	overflow: hidden;
+}
+
+.ce-modal-image img {
+	width: 100%;
+	display: block;
+}
+
+.ce-modal-body {
+	padding: 1.5rem;
+}
+
+.ce-modal-title {
+	font-size: 1.25rem;
+	font-weight: 700;
+	color: var( --ce-primary );
+	margin: 0 0 0.75rem;
+}
+
+.ce-modal-meta {
+	font-size: var( --ce-font-size-meta );
+	color: var( --ce-muted );
+	margin-bottom: 1rem;
+}
+
+.ce-modal-description {
+	font-size: var( --ce-font-size-body );
+	color: var( --ce-text );
+	line-height: var( --ce-line-height );
+	margin-bottom: 1.25rem;
+}
+
+/* -------------------------------------------------------------------------
+   Loading / empty states
+   ------------------------------------------------------------------------- */
+
+.ce-loading,
+.ce-no-events {
+	text-align: center;
+	padding: 3rem 1rem;
+	color: var( --ce-muted );
+	font-size: var( --ce-font-size-meta );
+}
+
+.ce-loading::before {
+	content: '';
+	display: block;
+	width: 32px;
+	height: 32px;
+	border: 3px solid var( --ce-border-color );
+	border-top-color: var( --ce-primary );
+	border-radius: 50%;
+	animation: ce-spin 0.8s linear infinite;
+	margin: 0 auto 0.75rem;
+}
+
+@keyframes ce-spin {
+	to { transform: rotate( 360deg ); }
+}
+
+/* -------------------------------------------------------------------------
+   Responsive
+   ------------------------------------------------------------------------- */
+
+@media ( max-width: 852px ) {
+
+	.church-events .ce-filter-category,
+	.church-events .ce-filter-site,
+	.church-events .ce-filter-month {
+		flex: 0 0 calc( 50% - 0.375rem );
+	}
+
+	.church-events .ce-filter-date-from,
+	.church-events .ce-filter-date-to {
+		flex: 0 0 calc( 50% - 0.375rem );
+	}
+}
+
+@media ( max-width: 1024px ) {
+
+	.ce-events-grid {
+		grid-template-columns: repeat( min( 2, var( --ce-columns, 3 ) ), 1fr );
+	}
+}
+
+@media ( max-width: 768px ) {
+
+	.ce-events-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.ce-toolbar {
+		align-items: stretch;
+	}
+
+	.church-events .ce-filter-search,
+	.church-events .ce-filter-category,
+	.church-events .ce-filter-site,
+	.church-events .ce-filter-month,
+	.church-events .ce-filter-date-from,
+	.church-events .ce-filter-date-to {
+		flex: 0 0 100%;
+	}
+}
+
+/* -------------------------------------------------------------------------
+   View visibility
+   ------------------------------------------------------------------------- */
+
+.ce-view {
+	display: none;
+}
+
+.ce-view.is-active {
+	display: block;
+}
+
+/* -------------------------------------------------------------------------
+   FullCalendar overrides
+   All scoped — no !important needed as these are more specific than FC defaults
+   ------------------------------------------------------------------------- */
+
+.church-events .fc {
+	font-family: inherit;
+	font-size: var( --ce-font-size-body );
+	color: var( --ce-text );
+}
+
+.church-events .fc .fc-toolbar-title {
+	font-size: 1.1rem;
+	font-weight: 600;
+	color: var( --ce-primary );
+}
+
+.church-events .fc .fc-button {
+	background:    var( --ce-primary );
+	border-color:  var( --ce-primary );
+	border-radius: var( --ce-btn-radius );
+	font-size:     var( --ce-btn-font-size );
+	padding:       0.35rem 0.75rem;
+	transition:    background var( --ce-transition ), border-color var( --ce-transition );
+}
+
+.church-events .fc .fc-button:hover,
+.church-events .fc .fc-button:focus {
+	background:   var( --ce-secondary );
+	border-color: var( --ce-secondary );
+	outline:      none;
+}
+
+.church-events .fc .fc-button:focus-visible {
+	outline:        2px solid var( --ce-secondary );
+	outline-offset: 2px;
+}
+
+.church-events .fc .fc-button-primary:not(:disabled).fc-button-active {
+	background:   var( --ce-secondary );
+	border-color: var( --ce-secondary );
+}
+
+.church-events .fc .fc-col-header-cell {
+	background:  var( --ce-primary );
+	color:       #ffffff;
+	font-weight: 500;
+	font-size:   var( --ce-font-size-meta );
+	padding:     0.4rem 0;
+}
+
+.church-events .fc .fc-col-header-cell a {
+	color: #ffffff;
+	text-decoration: none;
+}
+
+.church-events .fc .fc-daygrid-day-number {
+	font-size:   var( --ce-font-size-meta );
+	color:       var( --ce-text );
+	padding:     0.25rem 0.5rem;
+	text-decoration: none;
+}
+
+.church-events .fc .fc-daygrid-day {
+	background: #ffffff;
+}
+
+.church-events .fc .fc-day-today {
+	background: rgba( 53, 135, 140, 0.08 );
+}
+
+.church-events .fc .fc-day-today .fc-daygrid-day-number {
+	background:    var( --ce-accent );
+	color:         #ffffff;
+	border-radius: 50%;
+	width:         1.5rem;
+	height:        1.5rem;
+	display:       flex;
+	align-items:   center;
+	justify-content: center;
+	padding:       0;
+	margin:        0.25rem;
+}
+
+/* Event chips */
+.church-events .fc .fc-daygrid-event {
+	background:    var( --ce-primary );
+	border-color:  var( --ce-primary );
+	border-radius: 3px;
+	font-size:     0.75rem;
+	padding:       1px 4px;
+	cursor:        pointer;
+	color:         #ffffff;
+	transition:    background var( --ce-transition );
+}
+
+.church-events .fc .fc-daygrid-event:hover {
+	background:   var( --ce-secondary );
+	border-color: var( --ce-secondary );
+	color:        #ffffff;
+}
+
+.church-events .fc .fc-daygrid-event .fc-event-title,
+.church-events .fc .fc-daygrid-event .ce-fc-title,
+.church-events .fc .fc-daygrid-event .ce-fc-time {
+	font-weight: 500;
+	color: #ffffff;
+}
+
+/* Custom event content */
+.ce-fc-event {
+	display:     flex;
+	align-items: baseline;
+	gap:         0.25rem;
+	overflow:    hidden;
+}
+
+.ce-fc-time {
+	font-size:   0.7rem;
+	opacity:     0.85;
+	flex-shrink: 0;
+}
+
+.ce-fc-title {
+	overflow:      hidden;
+	text-overflow: ellipsis;
+	white-space:   nowrap;
+}
+
+/* Remove the bottom colour strip issue */
+.church-events .fc .fc-scrollgrid {
+	border-bottom-color: var( --ce-border-color );
+}
+
+.church-events .fc-theme-standard td,
+.church-events .fc-theme-standard th {
+	border-color: var( --ce-border-color );
+}
+
+.church-events .fc .fc-scrollgrid-section-liquid > td {
+	border-bottom: none;
+}
+
+/* Modal footer */
+.ce-modal-footer {
+	padding-top: 1rem;
+	border-top:  1px solid var( --ce-border-color );
+	margin-top:  1rem;
+}
+
+/* -------------------------------------------------------------------------
+   Load More button
+   ------------------------------------------------------------------------- */
+
+.ce-load-more-wrap {
+	text-align: center;
+	padding: 2rem 0 1rem;
+}
+
+.ce-btn-load-more {
+	padding: 0.6rem 2rem;
+	font-size: var( --ce-font-size-body );
+	border-radius: var( --ce-btn-radius );
+	border: 2px solid var( --ce-primary );
+	background: transparent;
+	color: var( --ce-primary );
+	cursor: pointer;
+	transition: background var( --ce-transition ), color var( --ce-transition );
+}
+
+.ce-btn-load-more:hover {
+	background: var( --ce-primary );
+	color: #ffffff;
+}
+
+.ce-btn-load-more:disabled {
+	opacity: 0.6;
+	cursor: wait;
+}
+
+/* -------------------------------------------------------------------------
+   Date filter inputs
+   ------------------------------------------------------------------------- */
+
+.ce-filter-date-from,
+.ce-filter-date-to {
+	padding: 0.45rem 0.75rem;
+	font-size: var( --ce-font-size-meta );
+	border: 1px solid var( --ce-border-color );
+	border-radius: var( --ce-btn-radius );
+	background: #ffffff;
+	color: var( --ce-text );
+}
+
+.ce-filter-date-from:focus,
+.ce-filter-date-to:focus {
+	outline: 2px solid var( --ce-secondary );
+	outline-offset: 2px;
+	border-color: var( --ce-secondary );
+}
+
+@media ( max-width: 768px ) {
+	.ce-filter-date-from,
+	.ce-filter-date-to {
+		width: 100%;
+	}
+}
+
+/* -------------------------------------------------------------------------
+   Agenda view
+   ------------------------------------------------------------------------- */
+
+.ce-agenda-list {
+	display: flex;
+	flex-direction: column;
+}
+
+.ce-agenda-row {
+	display: flex;
+	align-items: flex-start;
+	gap: 1.5rem;
+	padding: 0.85rem 0;
+	border-top: 1px solid var( --ce-border-color );
+	cursor: pointer;
+	transition: background var( --ce-transition );
+}
+
+.ce-agenda-list .ce-agenda-row:last-child {
+	border-bottom: 1px solid var( --ce-border-color );
+}
+
+.ce-agenda-row:hover {
+	background: rgba( 0, 0, 0, 0.025 );
+	margin: 0 -0.75rem;
+	padding-left: 0.75rem;
+	padding-right: 0.75rem;
+}
+
+.ce-agenda-date-col {
+	flex: 0 0 3rem;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	line-height: 1.2;
+	padding-top: 0.1rem;
+}
+
+.ce-agenda-month {
+	font-size: 0.7rem;
+	font-weight: 600;
+	letter-spacing: 0.06em;
+	color: var( --ce-secondary );
+	text-transform: uppercase;
+}
+
+.ce-agenda-day-num {
+	font-size: 1.5rem;
+	font-weight: 700;
+	color: var( --ce-secondary );
+	line-height: 1.1;
+}
+
+.ce-agenda-year {
+	font-size: 0.7rem;
+	color: var( --ce-muted );
+	margin-top: 0.1rem;
+}
+
+.ce-agenda-detail-col {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	gap: 0.3rem;
+	min-width: 0;
+}
+
+.ce-agenda-title {
+	font-size: 1.1rem;
+	font-weight: 600;
+	color: var( --ce-primary );
+	line-height: 1.3;
+}
+
+.ce-agenda-meta {
+	display: flex;
+	align-items: center;
+	gap: 0.35rem;
+	font-size: var( --ce-font-size-meta );
+	color: var( --ce-muted );
+}
+
+.ce-agenda-meta svg {
+	flex-shrink: 0;
+	color: var( --ce-secondary );
+}
+
+.ce-agenda-image-col {
+	flex: 0 0 var( --ce-agenda-image-size, 3.5rem );
+	align-self: center;
+}
+
+.ce-agenda-image-col img {
+	width: var( --ce-agenda-image-size, 3.5rem );
+	height: var( --ce-agenda-image-size, 3.5rem );
+	border-radius: 500px !important;
+	object-fit: cover;
+	object-position: center;
+	display: block;
+	aspect-ratio: 1 / 1;
+}
+
+@media ( max-width: 768px ) {
+	.ce-agenda-date-col {
+		flex: 0 0 2.75rem;
+	}
+
+	.ce-agenda-day-num {
+		font-size: 1.25rem;
+	}
+}
