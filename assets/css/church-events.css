@@ -798,10 +798,11 @@
 
 .ce-agenda-meta {
 	display: flex;
-	align-items: center;
+	align-items: flex-start;
 	gap: 0.35rem;
 	font-size: var( --ce-font-size-meta );
 	color: var( --ce-muted );
+	line-height: 1.4;
 }
 
 .ce-agenda-meta svg {
