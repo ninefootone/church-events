@@ -2,6 +2,16 @@
 
 All notable changes to Church Events are documented here.
 
+## [1.6.3] - 2026-06-08
+
+### Fixed
+- Long email addresses in event descriptions no longer overflow the modal on narrow screens
+
+## [1.6.2] - 2026-06-08
+
+### Fixed
+- Fix icon placement on event meta
+
 ## [1.6.1] - 2026-06-05
 
 ### Fixed
