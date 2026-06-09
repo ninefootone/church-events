@@ -163,10 +163,14 @@
 	flex: 0 0 100%;
 }
 
+.church-events .ce-filter-label {
+	flex: 1 1 0;
+}
+
 .church-events .ce-filter-category,
 .church-events .ce-filter-site,
 .church-events .ce-filter-month {
-	flex: 1 1 0;
+	width: 100%;
 }
 
 .church-events .ce-filter-date-from,

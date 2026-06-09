@@ -2,6 +2,11 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.6.6
+
+### Fixed
+- Filter dropdowns not filling available width after being wrapped in label elements in v1.6.5
+
 ## 1.6.5
 
 ### Added
