@@ -2,6 +2,11 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.6.8
+
+### Fixed
+- Calendar prev/next/today buttons moved to right side of toolbar to restore expected position after view toggle buttons were hidden on mobile
+
 ## 1.6.7
 
 ### Fixed

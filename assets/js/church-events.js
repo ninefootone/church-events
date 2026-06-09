@@ -625,7 +625,7 @@
 
 		this.calendar = new FullCalendar.Calendar( this.el, {
 			initialView:     'dayGridMonth',
-			headerToolbar:   { left: 'prev,next today', center: 'title', right: '' },
+			headerToolbar:   { left: '', center: 'title', right: 'prev,next today' },
 			height:          'auto',
 			firstDay:        1,
 			eventTimeFormat: { hour: '2-digit', minute: '2-digit', hour12: false },
