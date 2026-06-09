@@ -2,6 +2,11 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.6.4
+
+### Fixed
+- View toggle buttons (calendar/cards/list) briefly flashing on mobile before being hidden by JS — toggles are now hidden via CSS at mobile breakpoint, before JS executes
+
 ## [1.6.3] - 2026-06-08
 
 ### Fixed

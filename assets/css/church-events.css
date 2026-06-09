@@ -208,6 +208,8 @@
 	overflow: hidden;
 	transition: transform var( --ce-transition ), box-shadow var( --ce-transition );
 	cursor: pointer;
+	display: flex;
+	flex-direction: column;
 }
 
 .ce-event-card:hover {
@@ -240,6 +242,9 @@
 /* Card body */
 .ce-card-body {
 	padding: var( --ce-card-padding );
+	display: flex;
+	flex-direction: column;
+	flex: 1;
 }
 
 .ce-card-title {
@@ -500,6 +505,9 @@
 	.church-events .ce-filter-date-to {
 		flex: 0 0 100%;
 	}
+    .ce-view-toggle {
+        display: none;
+    }
 }
 
 /* -------------------------------------------------------------------------

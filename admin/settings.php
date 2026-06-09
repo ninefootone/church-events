@@ -178,12 +178,12 @@ function ce_sanitize_fields_config( $input ) {
 function ce_default_archive_fields() {
 	return array(
 		'featured_image'  => array( 'enabled' => true,  'order' => 1,  'label' => __( 'Featured Image', 'church-events' ) ),
-		'title'           => array( 'enabled' => true,  'order' => 2,  'label' => __( 'Title', 'church-events' ) ),
-		'date'            => array( 'enabled' => true,  'order' => 3,  'label' => __( 'Date', 'church-events' ) ),
-		'time'            => array( 'enabled' => true,  'order' => 4,  'label' => __( 'Time', 'church-events' ) ),
-		'location'        => array( 'enabled' => true,  'order' => 5,  'label' => __( 'Location', 'church-events' ) ),
-		'excerpt'         => array( 'enabled' => true,  'order' => 6,  'label' => __( 'Excerpt', 'church-events' ) ),
-		'categories'      => array( 'enabled' => false, 'order' => 7,  'label' => __( 'Categories', 'church-events' ) ),
+		'categories'      => array( 'enabled' => false, 'order' => 2,  'label' => __( 'Categories', 'church-events' ) ),
+		'title'           => array( 'enabled' => true,  'order' => 3,  'label' => __( 'Title', 'church-events' ) ),
+		'date'            => array( 'enabled' => true,  'order' => 4,  'label' => __( 'Date', 'church-events' ) ),
+		'time'            => array( 'enabled' => true,  'order' => 5,  'label' => __( 'Time', 'church-events' ) ),
+		'location'        => array( 'enabled' => true,  'order' => 6,  'label' => __( 'Location', 'church-events' ) ),
+		'excerpt'         => array( 'enabled' => true,  'order' => 7,  'label' => __( 'Excerpt', 'church-events' ) ),
 		'booking_link'    => array( 'enabled' => true,  'order' => 8,  'label' => __( 'Booking Link', 'church-events' ) ),
 	);
 }
