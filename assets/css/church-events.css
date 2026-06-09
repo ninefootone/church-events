@@ -164,6 +164,9 @@
 }
 
 .church-events .ce-filter-label {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
 	flex: 1 1 0;
 }
 
@@ -472,9 +475,7 @@
 
 @media ( max-width: 852px ) {
 
-	.church-events .ce-filter-category,
-	.church-events .ce-filter-site,
-	.church-events .ce-filter-month {
+	.church-events .ce-filter-label {
 		flex: 0 0 calc( 50% - 0.375rem );
 	}
 
@@ -502,9 +503,7 @@
 	}
 
 	.church-events .ce-filter-search,
-	.church-events .ce-filter-category,
-	.church-events .ce-filter-site,
-	.church-events .ce-filter-month,
+	.church-events .ce-filter-label,
 	.church-events .ce-filter-date-from,
 	.church-events .ce-filter-date-to {
 		flex: 0 0 100%;
@@ -848,13 +847,7 @@
 	}
 }
 
-.ce-filter-label {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-}
-
-.ce-filter-label-text {
+.church-events .ce-filter-label-text {
     font-size: 0.75rem;
     font-weight: 600;
     letter-spacing: 0.05em;

@@ -2,6 +2,12 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.6.7
+
+### Fixed
+- Filter dropdowns stacking correctly on mobile (labels now use `flex: 0 0 100%` at 768px breakpoint)
+- Cleaned up duplicate and unscoped `.ce-filter-label` CSS rules introduced in v1.6.5
+
 ## 1.6.6
 
 ### Fixed
