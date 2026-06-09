@@ -2,6 +2,15 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.6.5
+
+### Added
+- Labels above category, site, and month filter dropdowns in the events toolbar
+- CSS styles for filter labels (`.ce-filter-label`, `.ce-filter-label-text`) with uppercase, small, weighted text
+
+### Fixed
+- Minor indentation inconsistency in site filter label markup in `shortcodes.php`
+
 ## 1.6.4
 
 ### Fixed

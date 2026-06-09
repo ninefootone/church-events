@@ -843,3 +843,17 @@
 		font-size: 1.25rem;
 	}
 }
+
+.ce-filter-label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.ce-filter-label-text {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--ce-text, currentColor);
+}

@@ -375,9 +375,12 @@ function ce_render_toolbar( $enabled_views, $default_view = '', $locked_site = '
 			<?php
 			$category_terms = get_terms( array( 'taxonomy' => 'event-category', 'hide_empty' => true ) );
 			if ( ! $locked_category && ! is_wp_error( $category_terms ) && count( $category_terms ) > 0 ) : ?>
-			<select class="ce-filter-category" aria-label="<?php esc_attr_e( 'Filter by category', 'church-events' ); ?>">
-				<option value=""><?php esc_html_e( 'All categories', 'church-events' ); ?></option>
-			</select>
+			<label class="ce-filter-label">
+				<span class="ce-filter-label-text"><?php esc_html_e( 'Category', 'church-events' ); ?></span>
+				<select class="ce-filter-category">
+					<option value=""><?php esc_html_e( 'All categories', 'church-events' ); ?></option>
+				</select>
+			</label>
 			<?php endif; ?>
 		<?php
 		$site_terms = get_terms( array( 'taxonomy' => 'event-site', 'hide_empty' => true ) );
@@ -387,17 +390,23 @@ function ce_render_toolbar( $enabled_views, $default_view = '', $locked_site = '
 			$all_label  = $site_label === 'church' ? __( 'All churches', 'church-events' ) : __( 'All sites', 'church-events' );
 			$aria_label = $site_label === 'church' ? __( 'Filter by church', 'church-events' ) : __( 'Filter by site', 'church-events' );
 			?>
-			<select class="ce-filter-site" aria-label="<?php echo esc_attr( $aria_label ); ?>">
+			<label class="ce-filter-label">
+			<span class="ce-filter-label-text"><?php echo esc_html( ucfirst( $site_label ) ); ?></span>
+			<select class="ce-filter-site">
 				<option value=""><?php echo esc_html( $all_label ); ?></option>
 				<?php foreach ( $site_terms as $term ) : ?>
 				<option value="<?php echo esc_attr( $term->slug ); ?>"><?php echo esc_html( $term->name ); ?></option>
 				<?php endforeach; ?>
 			</select>
+		</label>
 			<?php endif; ?>
 				<?php if ( $show_month ) : ?>
-				<select class="ce-filter-month" aria-label="<?php esc_attr_e( 'Filter by month', 'church-events' ); ?>">
-					<option value=""><?php esc_html_e( 'All months', 'church-events' ); ?></option>
-				</select>
+				<label class="ce-filter-label">
+					<span class="ce-filter-label-text"><?php esc_html_e( 'Month', 'church-events' ); ?></span>
+					<select class="ce-filter-month">
+						<option value=""><?php esc_html_e( 'All months', 'church-events' ); ?></option>
+					</select>
+				</label>
 				<?php else : ?>
 				<input
 					type="date"
