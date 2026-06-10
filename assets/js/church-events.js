@@ -34,6 +34,21 @@
 		return txt.value;
 	}
 
+	function escHtml( str ) {
+		if ( ! str ) return '';
+		const d = document.createElement( 'div' );
+		d.textContent = String( str );
+		return d.innerHTML;
+	}
+
+	function safeUrl( url ) {
+		if ( ! url ) return '#';
+		try {
+			const u = new URL( url );
+			return ( u.protocol === 'https:' || u.protocol === 'http:' ) ? url : '#';
+		} catch ( e ) { return '#'; }
+	}
+
 	function formatDate( dateStr ) {
 		if ( ! dateStr || dateStr.length < 8 ) return '';
 		const y = parseInt( dateStr.substring( 0, 4 ), 10 );
@@ -218,18 +233,21 @@
 
 			case 'location':
 				if ( ! meta.location ) return '';
-				return '<span class="ce-card-meta-item ce-meta-location">' + meta.location + '</span>';
+				return '<span class="ce-card-meta-item ce-meta-location">' + escHtml( meta.location ) + '</span>';
 
 			case 'address':
 				if ( ! meta.address ) return '';
-				return '<span class="ce-card-meta-item ce-meta-address">' + meta.address + '</span>';
+				return '<span class="ce-card-meta-item ce-meta-address">' + escHtml( meta.address ) + '</span>';
 
 			case 'excerpt': {
 				if ( context === 'detail' ) return '';
-				const ex = event.excerpt && event.excerpt.rendered
-					? event.excerpt.rendered.replace( /<[^>]+>/g, '' ).trim() : '';
+				const rawEx = event.excerpt && event.excerpt.rendered ? event.excerpt.rendered : '';
+				if ( ! rawEx ) return '';
+				const tmpEx = document.createElement( 'div' );
+				tmpEx.innerHTML = rawEx;
+				const ex = tmpEx.textContent.trim();
 				if ( ! ex ) return '';
-				return '<p class="ce-card-excerpt">' + ex + '</p>';
+				return '<p class="ce-card-excerpt">' + escHtml( ex ) + '</p>';
 			}
 
 			case 'description': {
@@ -250,8 +268,8 @@
 
 			case 'booking_link': {
 				if ( ! meta.booking_url ) return '';
-				const lbl = meta.booking_text || cfg.i18n.bookNow;
-				return '<div class="ce-card-booking"><a href="' + meta.booking_url + '" class="ce-btn ce-btn-primary" target="_blank" rel="noopener noreferrer">' + lbl + '</a></div>';
+				const lbl = escHtml( meta.booking_text || cfg.i18n.bookNow );
+				return '<div class="ce-card-booking"><a href="' + safeUrl( meta.booking_url ) + '" class="ce-btn ce-btn-primary" target="_blank" rel="noopener noreferrer">' + lbl + '</a></div>';
 			}
 
 			default:
@@ -358,7 +376,7 @@
 		if ( meta.location ) {
 			locationLine = '<span class="ce-agenda-meta ce-agenda-location">'
 				+ '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>'
-				+ meta.location + '</span>';
+					+ escHtml( meta.location ) + '</span>';
 		}
 
 		var imageHtml = '';

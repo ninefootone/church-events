@@ -2,6 +2,16 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.6.9
+
+### Fixed
+- XSS: escaped `location`, `address`, `booking_url`, `booking_text`, and `excerpt` fields in front-end JS before injecting into `innerHTML`
+- XSS: replaced regex strip-tags on excerpt with safe `textContent` extraction
+- XSS: added `safeUrl()` helper to validate booking URL protocol before use in `href`
+- Log file moved to `uploads/church-events/` subdirectory with `.htaccess` protection to prevent direct web access
+- SSRF: ChurchSuite feed URL now validated against private/loopback IP ranges on save
+- Sync key: added minimum length warning (32 characters) when saving a weak server cron key
+
 ## 1.6.8
 
 ### Fixed

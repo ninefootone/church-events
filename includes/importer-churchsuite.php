@@ -633,9 +633,18 @@ function ce_trash_removed_events( $feed_identifiers ) {
  */
 function ce_log( $message ) {
 	$upload_dir = wp_upload_dir();
-	$log_file   = $upload_dir['basedir'] . '/church-events-log.txt';
+	$log_dir    = $upload_dir['basedir'] . '/church-events/';
 
-	$line = '[' . current_time( 'Y-m-d H:i:s' ) . '] ' . $message . PHP_EOL;
+	wp_mkdir_p( $log_dir );
+
+	// Block direct web access to this directory
+	$htaccess = $log_dir . '.htaccess';
+	if ( ! file_exists( $htaccess ) ) {
+		file_put_contents( $htaccess, "Deny from all\n" );
+	}
+
+	$log_file = $log_dir . 'church-events-log.txt';
+	$line     = '[' . current_time( 'Y-m-d H:i:s' ) . '] ' . $message . PHP_EOL;
 
 	// Keep log to last 500 lines
 	if ( file_exists( $log_file ) ) {

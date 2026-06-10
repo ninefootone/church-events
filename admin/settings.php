@@ -65,11 +65,26 @@ function ce_sanitize_settings( $input ) {
 
 	// Import
 	$sanitized['source_type']       = isset( $input['source_type'] ) ? sanitize_text_field( $input['source_type'] ) : 'churchsuite';
-	$sanitized['churchsuite_url']   = ! empty( $input['churchsuite_url'] ) ? esc_url_raw( $input['churchsuite_url'] ) : ( $sanitized['churchsuite_url'] ?? '' );
+	if ( ! empty( $input['churchsuite_url'] ) ) {
+		$candidate = esc_url_raw( $input['churchsuite_url'] );
+		$host      = parse_url( $candidate, PHP_URL_HOST );
+		$ip        = $host ? gethostbyname( $host ) : '';
+		if ( $ip && filter_var( $ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE ) !== false ) {
+			$sanitized['churchsuite_url'] = $candidate;
+		} else {
+			$sanitized['churchsuite_url'] = $sanitized['churchsuite_url'] ?? '';
+			add_settings_error( 'ce_settings', 'churchsuite_url_invalid', __( 'ChurchSuite Feed URL must be a publicly accessible address.', 'church-events' ), 'error' );
+		}
+	} else {
+		$sanitized['churchsuite_url'] = $sanitized['churchsuite_url'] ?? '';
+	}
 	$sanitized['google_cal_id']     = isset( $input['google_cal_id'] ) ? sanitize_text_field( $input['google_cal_id'] ) : ( $sanitized['google_cal_id'] ?? '' );
 	$sanitized['google_api_key']    = isset( $input['google_api_key'] ) ? sanitize_text_field( $input['google_api_key'] ) : ( $sanitized['google_api_key'] ?? '' );
 	$sanitized['sync_interval']     = isset( $input['sync_interval'] ) ? sanitize_text_field( $input['sync_interval'] ) : ( $sanitized['sync_interval'] ?? 'hourly' );
-	$sanitized['sync_key']          = ! empty( $input['sync_key'] ) ? sanitize_text_field( $input['sync_key'] ) : ( $sanitized['sync_key'] ?? '' );
+	$sanitized['sync_key'] = ! empty( $input['sync_key'] ) ? sanitize_text_field( $input['sync_key'] ) : ( $sanitized['sync_key'] ?? '' );
+	if ( ! empty( $sanitized['sync_key'] ) && strlen( $sanitized['sync_key'] ) < 32 ) {
+		add_settings_error( 'ce_settings', 'sync_key_weak', __( 'Server Cron Key should be at least 32 characters long. Consider using a randomly generated value.', 'church-events' ), 'warning' );
+	}
 
 	// CPT rewrite slug — changing this requires a permalink flush (handled below)
 	$new_slug = ! empty( $input['cpt_slug'] ) ? sanitize_title( $input['cpt_slug'] ) : '';
