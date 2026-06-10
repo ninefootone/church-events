@@ -151,8 +151,9 @@ function ce_fetch_google_events( $calendar_id, $api_key ) {
 	$all_events = array();
 	$page_token = null;
 
-	// Only fetch events from today onwards — avoids importing historical events
+	// Only fetch events from today onwards, up to 6 months ahead
 	$time_min = gmdate( 'Y-m-d\TH:i:s\Z' );
+	$time_max = gmdate( 'Y-m-d\TH:i:s\Z', strtotime( '+6 months' ) );
 
 	do {
 		$args = array(
@@ -160,6 +161,7 @@ function ce_fetch_google_events( $calendar_id, $api_key ) {
 			'singleEvents' => 'true',       // Expand recurring events into individual instances
 			'orderBy'      => 'startTime',
 			'timeMin'      => $time_min,
+			'timeMax'      => $time_max,
 			'maxResults'   => 250,          // API maximum per page
 		);
 

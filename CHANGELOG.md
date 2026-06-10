@@ -2,6 +2,11 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.7.1
+
+### Fixed
+- Google Calendar importer now limits fetched events to a 6-month window (`timeMax`) to prevent PHP timeout on calendars with large numbers of recurring events
+
 ## 1.7.0
 
 ### Added
