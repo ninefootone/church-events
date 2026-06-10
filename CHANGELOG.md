@@ -2,6 +2,11 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.7.0
+
+### Added
+- Google Calendar importer (`includes/importer-google.php`) — fetches events server-side via the Google Calendar API, with full pagination support, upsert deduplication on Google event ID, all-day event handling, and automatic trashing of events removed from the calendar
+
 ## 1.6.9
 
 ### Fixed
