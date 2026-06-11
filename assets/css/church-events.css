@@ -834,7 +834,7 @@
 
 .ce-agenda-image-col {
 	flex: 0 0 var( --ce-agenda-image-size, 3.5rem );
-	align-self: center;
+	align-self: flex-start;
 }
 
 .ce-agenda-image-col img {

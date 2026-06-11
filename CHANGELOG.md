@@ -2,6 +2,11 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.7.3
+
+### Fixed
+- Agenda view event image now aligns to the top of the row instead of centre
+
 ## 1.7.2
 
 ### Fixed
