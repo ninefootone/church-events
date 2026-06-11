@@ -2,6 +2,11 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.7.2
+
+### Fixed
+- Dropdown arrow on category, site, and month filters now uses a custom SVG chevron with `appearance: none`, giving consistent cross-browser positioning and spacing
+
 ## 1.7.1
 
 ### Fixed
