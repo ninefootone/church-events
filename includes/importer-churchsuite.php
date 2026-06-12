@@ -381,6 +381,19 @@ function ce_upsert_churchsuite_event( $cs, $site_lookup = array() ) {
 	ce_assign_sites( $post_id, $cs['site_ids'] ?? array(), $site_lookup );
 
 	// ---------------------------------------------------------------------------
+	// Assign event-featured taxonomy term
+	// ---------------------------------------------------------------------------
+
+	if ( ! empty( $cs['signup_options']['public']['featured'] ) ) {
+		if ( ! term_exists( 'featured', 'event-featured' ) ) {
+			wp_insert_term( 'Featured', 'event-featured', array( 'slug' => 'featured' ) );
+		}
+		wp_set_object_terms( $post_id, 'featured', 'event-featured', false );
+	} else {
+		wp_set_object_terms( $post_id, array(), 'event-featured', false );
+	}
+
+	// ---------------------------------------------------------------------------
 	// Assign event-month taxonomy term (auto from start date)
 	// ---------------------------------------------------------------------------
 

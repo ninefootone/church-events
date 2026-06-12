@@ -116,6 +116,25 @@ function ce_register_taxonomies() {
 		'query_var'         => true,
 		'rewrite'           => array( 'slug' => 'event-site' ),
 	) );
+
+	// Event Featured — binary flag from ChurchSuite feed
+	$featured_labels = array(
+		'name'          => __( 'Featured', 'church-events' ),
+		'singular_name' => __( 'Featured', 'church-events' ),
+		'menu_name'     => __( 'Featured', 'church-events' ),
+	);
+
+	register_taxonomy( 'event-featured', 'event', array(
+		'hierarchical'      => false,
+		'labels'            => $featured_labels,
+		'public'            => true,
+		'show_ui'           => false,
+		'show_in_rest'      => true,
+		'show_admin_column' => false,
+		'show_in_nav_menus' => false,
+		'query_var'         => true,
+		'rewrite'           => array( 'slug' => 'event-featured' ),
+	) );
 }
 add_action( 'init', 'ce_register_taxonomies' );
 

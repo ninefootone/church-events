@@ -2,6 +2,15 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.7.7
+
+### Added
+- ChurchSuite importer now reads the `featured` flag from the feed (`signup_options.public.featured`) and assigns events to a new hidden `event-featured` taxonomy.
+- New `event-featured` taxonomy (public, hidden from admin UI and nav menus) — enables filtering featured events in Elementor loop grids and other taxonomy-based queries.
+
+### Notes
+- The featured term is added or removed on every sync, so featured status stays in step with ChurchSuite.
+
 ## 1.7.6 — 2026-06-12
 
 ### Fixed
