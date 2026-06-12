@@ -209,19 +209,7 @@
 
 .ce-filter-select:focus,
 .ce-filter-search:focus {
-	outline: 2px solid var( --ce-secondary );
-	outline-offset: 2px;
-	border-color: var( --ce-secondary );
-}
-
-.ce-filter-search-wrap:focus-within .ce-filter-search {
 	outline: none;
-}
-
-.ce-filter-search-wrap:focus-within {
-	outline: 2px solid var( --ce-secondary );
-	outline-offset: 2px;
-	border-radius: var( --ce-btn-radius );
 }
 
 /* -------------------------------------------------------------------------

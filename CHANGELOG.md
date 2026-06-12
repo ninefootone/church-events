@@ -2,6 +2,11 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.7.6 — 2026-06-12
+
+### Fixed
+- Removed focus ring on search and filter inputs
+
 ## 1.7.5 — 2026-06-12
 
 ### Fixed
