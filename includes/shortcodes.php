@@ -366,12 +366,15 @@ function ce_render_toolbar( $enabled_views, $default_view = '', $locked_site = '
 
 		<div class="ce-filters-bar">
 			<div class="ce-filters">
+				<div class="ce-filter-search-wrap">
+				<svg class="ce-filter-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
 				<input
 					type="search"
 					class="ce-filter-search"
 					placeholder="<?php esc_attr_e( 'Search events…', 'church-events' ); ?>"
 					aria-label="<?php esc_attr_e( 'Search events', 'church-events' ); ?>"
 				/>
+			</div>
 			<?php
 			$category_terms = get_terms( array( 'taxonomy' => 'event-category', 'hide_empty' => true ) );
 			if ( ! $locked_category && ! is_wp_error( $category_terms ) && count( $category_terms ) > 0 ) : ?>

@@ -2,6 +2,11 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.7.4 — 2026-06-12
+
+### Added
+- Search input now includes an inline search icon, injected via a wrapper div in the toolbar markup
+
 ## 1.7.3
 
 ### Fixed

@@ -151,7 +151,7 @@
 .church-events .ce-filter-search,
 .church-events .ce-filter-date-from,
 .church-events .ce-filter-date-to {
-	padding: 0.45rem 0.75rem;
+	padding: 0.6rem 0.75rem;
 	font-size: var( --ce-font-size-meta );
 	border: 1px solid var( --ce-border-color );
 	border-radius: var( --ce-btn-radius );
@@ -164,13 +164,29 @@
 .church-events .ce-filter-month {
 	appearance: none;
 	-webkit-appearance: none;
-	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%23666' d='M5 7L0 2h10z'/%3E%3C/svg%3E");
 	background-repeat: no-repeat;
 	background-position: right 0.75rem center;
+	padding-right: 2rem;
+}
+
+.ce-filter-search-wrap {
+	position: relative;
+	flex: 0 0 100%;
+}
+
+.ce-filter-search-icon {
+	position: absolute;
+	left: 0.9rem;
+	top: 50%;
+	transform: translateY( -50% );
+	color: #999;
+	pointer-events: none;
 }
 
 .church-events .ce-filter-search {
-	flex: 0 0 100%;
+	width: 100%;
+	padding-left: 2.5rem;
 }
 
 .church-events .ce-filter-label {
