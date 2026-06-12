@@ -2,6 +2,20 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.7.9
+
+### Added
+- Per-category colours for events. Categories are seeded with their colour from the ChurchSuite feed on first import; colours can be overridden manually on the category edit screen (Events → Categories) and manual values are never overwritten by sync. Leave the field empty to use the default style.
+- Category colours applied on the front end: calendar grid pills (with automatic light/dark text for readability) and category tags on card and list views.
+
+### Changed
+- Calendar month grid now renders timed events as block pills (`eventDisplay: 'block'`) so category colours apply correctly.
+- Pill text colour now inherits from the event element rather than being forced white, supporting light category colours.
+
+### Notes
+- Coloured pills don't change colour on hover (default-styled pills still do).
+- Known limitation: a deliberately cleared colour will be re-seeded from ChurchSuite on next sync.
+
 ## 1.7.8
 
 ### Changed

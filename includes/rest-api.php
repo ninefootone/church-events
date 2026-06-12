@@ -146,9 +146,10 @@ function ce_rest_expose_meta() {
 			if ( is_wp_error( $terms ) ) return array();
 			return array_map( function( $term ) {
 				return array(
-					'id'   => $term->term_id,
-					'name' => $term->name,
-					'slug' => $term->slug,
+					'id'    => $term->term_id,
+					'name'  => $term->name,
+					'slug'  => $term->slug,
+					'color' => get_term_meta( $term->term_id, 'ce_category_color', true ) ?: '',
 				);
 			}, $terms );
 		},

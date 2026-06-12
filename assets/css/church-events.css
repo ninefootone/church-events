@@ -655,7 +655,7 @@
 .church-events .fc .fc-daygrid-event .ce-fc-title,
 .church-events .fc .fc-daygrid-event .ce-fc-time {
 	font-weight: 500;
-	color: #ffffff;
+	color: inherit;
 }
 
 /* Custom event content */

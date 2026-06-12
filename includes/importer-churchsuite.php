@@ -371,7 +371,7 @@ function ce_upsert_churchsuite_event( $cs, $site_lookup = array() ) {
 	// ---------------------------------------------------------------------------
 
 	if ( ! empty( $cs['category']['name'] ) ) {
-		ce_assign_category( $post_id, $cs['category']['name'] );
+		ce_assign_category( $post_id, $cs['category']['name'], $cs['category']['color'] ?? '' );
 	}
 
 	// ---------------------------------------------------------------------------
@@ -467,7 +467,7 @@ function ce_get_post_by_churchsuite_id( $identifier, $numeric_id = null ) {
  * @param int    $post_id
  * @param string $category_name
  */
-function ce_assign_category( $post_id, $category_name ) {
+function ce_assign_category( $post_id, $category_name, $category_color = '' ) {
 	$category_name = sanitize_text_field( $category_name );
 	$slug          = sanitize_title( $category_name );
 
@@ -477,6 +477,15 @@ function ce_assign_category( $post_id, $category_name ) {
 	}
 
 	wp_set_object_terms( $post_id, $slug, 'event-category', false );
+
+	// Seed colour from ChurchSuite only if none set — manual edits win
+	$term = get_term_by( 'slug', $slug, 'event-category' );
+	if ( $term && ! is_wp_error( $term ) && empty( get_term_meta( $term->term_id, 'ce_category_color', true ) ) ) {
+		$color = sanitize_hex_color( $category_color );
+		if ( $color ) {
+			update_term_meta( $term->term_id, 'ce_category_color', $color );
+		}
+	}
 }
 
 /**

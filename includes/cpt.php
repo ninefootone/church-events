@@ -171,3 +171,58 @@ function ce_auto_assign_event_month( $post_id ) {
 	wp_set_object_terms( $post_id, $term_slug, 'event-month', false );
 }
 add_action( 'save_post', 'ce_auto_assign_event_month' );
+
+// ---------------------------------------------------------------------------
+// Category colour (term meta)
+// ---------------------------------------------------------------------------
+
+/**
+ * Colour field on the Add Category screen.
+ */
+function ce_category_color_add_field() {
+	?>
+	<div class="form-field term-color-wrap">
+		<label for="ce-category-color"><?php esc_html_e( 'Colour', 'church-events' ); ?></label>
+		<input type="text" id="ce-category-color" name="ce_category_color" value="" placeholder="#12b886" />
+		<p><?php esc_html_e( 'Hex colour for this category. Leave empty to use the default.', 'church-events' ); ?></p>
+	</div>
+	<?php
+}
+add_action( 'event-category_add_form_fields', 'ce_category_color_add_field' );
+
+/**
+ * Colour field on the Edit Category screen.
+ */
+function ce_category_color_edit_field( $term ) {
+	$color = get_term_meta( $term->term_id, 'ce_category_color', true );
+	?>
+	<tr class="form-field term-color-wrap">
+		<th scope="row"><label for="ce-category-color"><?php esc_html_e( 'Colour', 'church-events' ); ?></label></th>
+		<td>
+			<input type="text" id="ce-category-color" name="ce_category_color" value="<?php echo esc_attr( $color ); ?>" placeholder="#12b886" />
+			<?php if ( $color ) : ?>
+				<span style="display:inline-block;width:20px;height:20px;border-radius:3px;vertical-align:middle;margin-left:8px;background:<?php echo esc_attr( $color ); ?>;"></span>
+			<?php endif; ?>
+			<p class="description"><?php esc_html_e( 'Hex colour for this category. Leave empty to use the default.', 'church-events' ); ?></p>
+		</td>
+	</tr>
+	<?php
+}
+add_action( 'event-category_edit_form_fields', 'ce_category_color_edit_field' );
+
+/**
+ * Save the colour on category create/edit.
+ */
+function ce_category_color_save( $term_id ) {
+	if ( ! isset( $_POST['ce_category_color'] ) ) return;
+
+	$color = sanitize_hex_color( trim( wp_unslash( $_POST['ce_category_color'] ) ) );
+
+	if ( $color ) {
+		update_term_meta( $term_id, 'ce_category_color', $color );
+	} else {
+		delete_term_meta( $term_id, 'ce_category_color' );
+	}
+}
+add_action( 'created_event-category', 'ce_category_color_save' );
+add_action( 'edited_event-category', 'ce_category_color_save' );

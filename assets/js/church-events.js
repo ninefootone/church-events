@@ -262,7 +262,10 @@
 				if ( ! cats.length ) return '';
 				return '<div class="ce-card-categories">' +
 					cats.map( function( c ) {
-						return '<span class="ce-category-tag">' + decodeEntities( c.name ) + '</span>';
+						var style = c.color
+							? ' style="background-color:' + c.color + ';color:' + ceTextColorFor( c.color ) + ';"'
+							: '';
+						return '<span class="ce-category-tag"' + style + '>' + decodeEntities( c.name ) + '</span>';
 					} ).join( '' ) + '</div>';
 			}
 
@@ -643,6 +646,7 @@
 
 		this.calendar = new FullCalendar.Calendar( this.el, {
 			initialView:     'dayGridMonth',
+			eventDisplay:    'block',
 			headerToolbar:   { left: '', center: 'title', right: 'prev,next today' },
 			height:          'auto',
 			firstDay:        1,
@@ -711,10 +715,26 @@
 		}
 	};
 
+	/**
+	 * Pick readable text colour (light/dark) for a hex background.
+	 */
+	function ceTextColorFor( hex ) {
+		var h = ( hex || '' ).replace( '#', '' );
+		if ( h.length === 3 ) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
+		if ( h.length !== 6 ) return '';
+		var r = parseInt( h.substr( 0, 2 ), 16 );
+		var g = parseInt( h.substr( 2, 2 ), 16 );
+		var b = parseInt( h.substr( 4, 2 ), 16 );
+		// Perceived luminance (ITU-R BT.709)
+		var lum = ( 0.2126 * r + 0.7152 * g + 0.0722 * b ) / 255;
+		return lum > 0.6 ? '#1a1a1a' : '#ffffff';
+	}
+
 	CalendarView.prototype.toFCEvent = function( event ) {
 		var meta   = event.event_meta || {};
 		var allDay = isAllDay( meta );
-		return {
+		var color  = ( event.event_categories && event.event_categories[0] && event.event_categories[0].color ) || '';
+		var fcEvent = {
 			id:    event.id,
 			title: decodeEntities( ( event.title && event.title.rendered ) || '' ),
 			start: toISO( meta.start_date, allDay ? null : meta.start_time ),
@@ -725,6 +745,14 @@
 				startTime: allDay ? '' : formatTime( meta.start_time ),
 			},
 		};
+
+		if ( color ) {
+			fcEvent.backgroundColor = color;
+			fcEvent.borderColor     = color;
+			fcEvent.textColor       = ceTextColorFor( color );
+		}
+
+		return fcEvent;
 	};
 
 	CalendarView.prototype.setFilters = function( category, site, search, month ) {
