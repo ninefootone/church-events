@@ -2,6 +2,13 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.7.5 — 2026-06-12
+
+### Fixed
+- Search icon weight increased for better visibility
+- Dropdown chevron replaced with heavier stroked version to match reference design
+- Search field focus style moved to wrapper element to prevent double border ring
+
 ## 1.7.4 — 2026-06-12
 
 ### Added
