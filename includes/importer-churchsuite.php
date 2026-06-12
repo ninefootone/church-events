@@ -622,6 +622,9 @@ function ce_trash_removed_events( $feed_identifiers ) {
 
 	$trashed = 0;
 
+	$today  = date( 'Ymd' );
+	$cutoff = date( 'Ymd', strtotime( '-1 month' ) );
+
 	foreach ( $existing_posts as $post_id ) {
 		$identifier = get_post_meta( $post_id, 'event_churchsuite_id', true );
 
@@ -629,6 +632,14 @@ function ce_trash_removed_events( $feed_identifiers ) {
 		if ( empty( $identifier ) ) continue;
 
 		if ( ! in_array( $identifier, $feed_identifiers, true ) ) {
+
+			// Past events naturally drop out of the feed — keep them for
+			// 1 month so the calendar grid stays populated, then trash.
+			$start_date = get_post_meta( $post_id, 'event_start_date', true );
+			if ( ! empty( $start_date ) && $start_date < $today && $start_date >= $cutoff ) {
+				continue;
+			}
+
 			wp_trash_post( $post_id );
 			ce_log( 'Trashed event no longer in ChurchSuite feed: ' . get_the_title( $post_id ) . ' (' . $identifier . ')' );
 			$trashed++;

@@ -2,6 +2,11 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.7.8
+
+### Changed
+- ChurchSuite sync now retains past events for 1 month after their start date instead of trashing them as soon as they drop out of the feed — keeps the calendar month grid populated later in the month. Future events removed from ChurchSuite are still trashed promptly, and events older than 1 month are trashed as before (then purged automatically by WordPress after 30 days).
+
 ## 1.7.7
 
 ### Added
