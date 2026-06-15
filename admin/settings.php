@@ -145,6 +145,7 @@ function ce_sanitize_settings( $input ) {
 	$sanitized['per_page']         = isset( $input['per_page'] )         ? absint( $input['per_page'] )                                                                         : ( $sanitized['per_page']         ?? 12      );
 	$sanitized['fallback_image_id'] = ! empty( $input['fallback_image_id'] ) ? absint( $input['fallback_image_id'] )                                                            : ( $sanitized['fallback_image_id'] ?? 0      );
 	$sanitized['site_label']       = ( isset( $input['site_label'] ) && in_array( $input['site_label'], array( 'site', 'church' ), true ) ) ? $input['site_label']              : ( $sanitized['site_label']       ?? 'site'  );
+	$sanitized['calendar_first_day'] = isset( $input['calendar_first_day'] ) ? ( in_array( (int) $input['calendar_first_day'], array( 0, 1 ), true ) ? (int) $input['calendar_first_day'] : 1 ) : ( $sanitized['calendar_first_day'] ?? 1 );
 
 	// Interactions
 	$sanitized['card_interaction'] = ( isset( $input['card_interaction'] ) )                                           ? sanitize_text_field( $input['card_interaction'] )      : ( $sanitized['card_interaction'] ?? 'modal' );
@@ -636,6 +637,16 @@ function ce_render_tab_display( $s ) {
 					<?php esc_html_e( 'Church (e.g. "All churches")', 'church-events' ); ?>
 				</label>
 				<p class="description"><?php esc_html_e( 'Controls the label shown in the site filter dropdown on the frontend. Only visible if site terms exist.', 'church-events' ); ?></p>
+			</td>
+		</tr>
+	<tr>
+			<th scope="row"><label for="ce_calendar_first_day"><?php esc_html_e( 'Calendar week starts on', 'church-events' ); ?></label></th>
+			<td>
+				<?php $first_day = isset( $s['calendar_first_day'] ) ? (int) $s['calendar_first_day'] : 1; ?>
+				<select id="ce_calendar_first_day" name="ce_settings[calendar_first_day]">
+					<option value="1" <?php selected( $first_day, 1 ); ?>><?php esc_html_e( 'Monday', 'church-events' ); ?></option>
+					<option value="0" <?php selected( $first_day, 0 ); ?>><?php esc_html_e( 'Sunday', 'church-events' ); ?></option>
+				</select>
 			</td>
 		</tr>
 	</table>

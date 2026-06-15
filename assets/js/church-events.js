@@ -649,7 +649,7 @@
 			eventDisplay:    'block',
 			headerToolbar:   { left: '', center: 'title', right: 'prev,next today' },
 			height:          'auto',
-			firstDay:        1,
+			firstDay:        ( typeof cfg.calendarFirstDay !== 'undefined' ) ? cfg.calendarFirstDay : 1,
 			eventTimeFormat: { hour: '2-digit', minute: '2-digit', hour12: false },
 
 			events: function( info, successCallback, failureCallback ) {

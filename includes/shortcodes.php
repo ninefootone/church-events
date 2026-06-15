@@ -175,6 +175,7 @@ function ce_build_js_config() {
 		),
 		'perPage'         => (int) ce_get_option( 'per_page', 12 ),
 		'listStyle'       => ce_get_option( 'list_style', 'cards' ),
+		'calendarFirstDay' => (int) ce_get_option( 'calendar_first_day', 1 ),
 	);
 }
 

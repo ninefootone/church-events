@@ -2,6 +2,11 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.7.14
+
+### Added
+- Calendar grid view now has a configurable week start day (Monday or Sunday), set under Settings → Display. Defaults to Monday, so existing sites are unaffected.
+
 ## 1.7.13
 
 ### Fixed
