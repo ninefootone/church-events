@@ -75,10 +75,26 @@ function ce_rest_event_query( $args, $request ) {
 		$args['s'] = sanitize_text_field( $search );
 	}
 
-	// Always order by start date ascending
-	$args['meta_key'] = 'event_start_date';
-	$args['orderby']  = 'meta_value_num';
-	$args['order']    = 'ASC';
+	// Order by start date, then start time, both ascending — so events on the same day
+	// appear in chronological order. The date-only sort left same-day events tied and
+	// MySQL returned them in an undefined order. Named meta_query clauses let us sort on
+	// two meta keys; they don't filter out anything (EXISTS matches every imported event,
+	// which always sets both keys — all-day events store an empty time, which sorts first).
+	$args['meta_query'] = isset( $args['meta_query'] ) ? $args['meta_query'] : array();
+	$args['meta_query']['ce_order_date'] = array(
+		'key'     => 'event_start_date',
+		'compare' => 'EXISTS',
+		'type'    => 'NUMERIC',
+	);
+	$args['meta_query']['ce_order_time'] = array(
+		'key'     => 'event_start_time',
+		'compare' => 'EXISTS',
+		'type'    => 'CHAR',
+	);
+	$args['orderby'] = array(
+		'ce_order_date' => 'ASC',
+		'ce_order_time' => 'ASC',
+	);
 
 	return $args;
 }

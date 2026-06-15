@@ -2,6 +2,11 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.7.13
+
+### Fixed
+- List, agenda and card views now sort same-day events by start time (ascending) rather than leaving them in an undefined order. Applies to all sources.
+
 ## 1.7.12
 
 ### Changed
