@@ -2,6 +2,11 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.7.11
+
+### Fixed
+- Google Calendar importer now refuses to run if another import is already in progress. Overlapping runs (cron firing during a manual sync, or two cron spawns racing) were each inserting the full feed, creating duplicate event posts. A self-expiring lock prevents this; the lock is always released, even if a run errors or bails early.
+
 ## 1.7.10
 
 ### Fixed
