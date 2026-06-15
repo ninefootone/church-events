@@ -2,6 +2,14 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.7.12
+
+### Changed
+- Google Calendar importer now counts untitled events (no title set in the calendar) as *skipped* rather than logging them as errors on every run. They were never a fault — just a content choice at the calendar end.
+
+### Fixed
+- ChurchSuite importer now refuses to start if another ChurchSuite import is already running, matching the guard added to the Google importer. Prevents overlapping cron/manual runs from creating duplicate event posts.
+
 ## 1.7.11
 
 ### Fixed

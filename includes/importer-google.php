@@ -242,9 +242,16 @@ function ce_fetch_google_events( $calendar_id, $api_key ) {
  */
 function ce_upsert_google_event( $gc ) {
 
-	// Require minimum fields
-	if ( empty( $gc['id'] ) || empty( $gc['summary'] ) ) {
-		return new WP_Error( 'invalid_event', 'Google event missing id or summary.' );
+	// Untitled events (Google omits 'summary' when an event has no title) are skipped
+	// quietly rather than logged as errors — that's a content choice at the calendar
+	// end, not a fault the importer should flag every run.
+	if ( empty( $gc['summary'] ) ) {
+		return 'skipped';
+	}
+
+	// A missing id is genuinely malformed and can't be tracked — keep this as an error.
+	if ( empty( $gc['id'] ) ) {
+		return new WP_Error( 'invalid_event', 'Google event missing id.' );
 	}
 
 	$google_id = sanitize_text_field( $gc['id'] );

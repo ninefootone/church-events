@@ -109,7 +109,17 @@ function ce_run_churchsuite_import() {
 		return array( 'imported' => 0, 'updated' => 0, 'skipped' => 0, 'errors' => 0 );
 	}
 
-	ce_log( 'ChurchSuite import started. Feed: ' . $url );
+	// Concurrency guard — bail if another ChurchSuite import is already running, so
+	// overlapping cron + manual "Sync Now" runs can't each insert the full feed. The
+	// transient self-expires as a safety net.
+	if ( get_transient( 'ce_churchsuite_import_lock' ) ) {
+		ce_log( 'ChurchSuite import skipped: another import is already running.' );
+		return array( 'imported' => 0, 'updated' => 0, 'skipped' => 0, 'errors' => 0 );
+	}
+	set_transient( 'ce_churchsuite_import_lock', time(), 15 * MINUTE_IN_SECONDS );
+
+	try {
+		ce_log( 'ChurchSuite import started. Feed: ' . $url );
 
 	$events = ce_fetch_churchsuite_feed( $url );
 
@@ -169,6 +179,10 @@ function ce_run_churchsuite_import() {
 	) );
 
 	return $counts;
+	} finally {
+		// Always release the lock, even if the import bailed early or errored.
+		delete_transient( 'ce_churchsuite_import_lock' );
+	}
 }
 
 // ---------------------------------------------------------------------------
