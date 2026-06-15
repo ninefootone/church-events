@@ -79,7 +79,17 @@ function ce_run_google_import() {
 		return array( 'imported' => 0, 'updated' => 0, 'skipped' => 0, 'errors' => 0, 'trashed' => 0 );
 	}
 
-	ce_log( 'Google Calendar import started. Calendar: ' . $calendar_id );
+	// Concurrency guard — bail if another import is already running, so overlapping
+	// cron + manual "Sync Now" runs can't each insert the full feed (the cause of the
+	// duplicate posts). The transient self-expires as a safety net.
+	if ( get_transient( 'ce_google_import_lock' ) ) {
+		ce_log( 'Google Calendar import skipped: another import is already running.' );
+		return array( 'imported' => 0, 'updated' => 0, 'skipped' => 0, 'errors' => 0, 'trashed' => 0 );
+	}
+	set_transient( 'ce_google_import_lock', time(), 15 * MINUTE_IN_SECONDS );
+
+	try {
+		ce_log( 'Google Calendar import started. Calendar: ' . $calendar_id );
 
 	$events = ce_fetch_google_events( $calendar_id, $api_key );
 
@@ -131,6 +141,10 @@ function ce_run_google_import() {
 	) );
 
 	return $counts;
+	} finally {
+		// Always release the lock, even if the import bailed early or errored.
+		delete_transient( 'ce_google_import_lock' );
+	}
 }
 
 // ---------------------------------------------------------------------------
