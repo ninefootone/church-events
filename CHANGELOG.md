@@ -2,6 +2,16 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.7.15
+
+### Added
+- Sync health monitor. Shows a WP Admin notice when the last event sync failed or has gone stale (no successful run within 3× the sync interval), and emails a configured address on entering a failure state. Email is failures-only and sends once per episode, resetting when the sync recovers.
+
+### Notes
+- Set the alert address via the `CE_SYNC_ALERT_EMAIL` constant in `includes/sync-monitor.php` (empty disables email; the admin notice still shows).
+- Email delivery depends on the site's mail configuration — SMTP is recommended, as the default PHP mailer is often unreliable.
+- Stale alerts depend on a sync running or an admin page loading; detecting a fully stalled cron on an unattended site needs external uptime monitoring, which is outside the plugin.
+
 ## 1.7.14
 
 ### Added
