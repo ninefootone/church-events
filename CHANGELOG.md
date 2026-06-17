@@ -2,6 +2,11 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.7.17
+
+### Changed
+- Share button in event modal replaced with a compact icon button; uses the native Web Share API on supported devices (mobile share sheet), falling back to clipboard copy on desktop.
+
 ## 1.7.16
 
 ### Added

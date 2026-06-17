@@ -332,9 +332,9 @@
 					+ '" class="ce-btn ce-btn-primary">' + cfg.i18n.viewDetails + '</a>';
 			}
 			footerHtml += '<div class="ce-modal-share">'
-				+ '<span class="ce-share-label">Share:</span>'
-				+ '<input class="ce-share-input" type="text" readonly value="' + event.event_url + '" />'
-				+ '<button class="ce-share-copy" data-url="' + event.event_url + '" aria-label="Copy link">Copy</button>'
+				+ '<button class="ce-share-btn" data-url="' + event.event_url + '" data-title="' + decodeEntities( ( event.title && event.title.rendered ) || '' ) + '" aria-label="Share this event">'
+				+ '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>'
+				+ '</button>'
 				+ '</div>'
 				+ '</div>';
 			html += footerHtml;
@@ -436,23 +436,29 @@
 		this.closeBtn && this.closeBtn.focus();
 		document.body.style.overflow = 'hidden';
 
-		var copyBtn = this.content.querySelector( '.ce-share-copy' );
-		if ( copyBtn ) {
-			copyBtn.addEventListener( 'click', function() {
-				var url = copyBtn.dataset.url;
-				if ( navigator.clipboard && navigator.clipboard.writeText ) {
+		var shareBtn = this.content.querySelector( '.ce-share-btn' );
+		if ( shareBtn ) {
+			shareBtn.addEventListener( 'click', function() {
+				var url   = shareBtn.dataset.url;
+				var title = shareBtn.dataset.title;
+				if ( navigator.share ) {
+					navigator.share( { title: title, url: url } ).catch( function() {} );
+				} else if ( navigator.clipboard && navigator.clipboard.writeText ) {
 					navigator.clipboard.writeText( url ).then( function() {
-						copyBtn.textContent = 'Copied!';
-						setTimeout( function() { copyBtn.textContent = 'Copy'; }, 2000 );
+						shareBtn.classList.add( 'is-copied' );
+						setTimeout( function() { shareBtn.classList.remove( 'is-copied' ); }, 2000 );
 					} );
 				} else {
-					var input = copyBtn.previousElementSibling;
-					if ( input ) {
-						input.select();
-						document.execCommand( 'copy' );
-						copyBtn.textContent = 'Copied!';
-						setTimeout( function() { copyBtn.textContent = 'Copy'; }, 2000 );
-					}
+					var ta = document.createElement( 'textarea' );
+					ta.value = url;
+					ta.style.position = 'fixed';
+					ta.style.opacity  = '0';
+					document.body.appendChild( ta );
+					ta.select();
+					document.execCommand( 'copy' );
+					document.body.removeChild( ta );
+					shareBtn.classList.add( 'is-copied' );
+					setTimeout( function() { shareBtn.classList.remove( 'is-copied' ); }, 2000 );
 				}
 			} );
 		}
