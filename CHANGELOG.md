@@ -2,6 +2,11 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.7.18
+
+### Changed
+- Modal share button: left-aligned, borderless, with inline "Share" label alongside the icon.
+
 ## 1.7.17
 
 ### Changed

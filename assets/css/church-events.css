@@ -703,34 +703,32 @@
 }
 
 .ce-modal-share {
-	margin-left: auto;
+	margin-right: auto;
 }
 
 .ce-share-btn {
-	display:         flex;
-	align-items:     center;
-	justify-content: center;
-	width:           2rem;
-	height:          2rem;
-	padding:         0;
-	border:          1px solid var( --ce-border-color );
-	border-radius:   var( --ce-btn-radius );
-	background:      transparent;
-	color:           var( --ce-text-muted, #6b7280 );
-	cursor:          pointer;
-	transition:      background 0.15s, color 0.15s, border-color 0.15s;
+	display:      flex;
+	align-items:  center;
+	gap:          0.4rem;
+	padding:      0.3rem 0;
+	border:       none;
+	background:   transparent;
+	color:        var( --ce-text-muted, #6b7280 );
+	cursor:       pointer;
+	font-size:    0.85rem;
+	transition:   color 0.15s;
 }
 
 .ce-share-btn:hover {
-	background:   var( --ce-accent, #2563eb );
-	color:        #fff;
-	border-color: var( --ce-accent, #2563eb );
+	color: var( --ce-accent, #2563eb );
 }
 
 .ce-share-btn.is-copied {
-	background:   #16a34a;
-	color:        #fff;
-	border-color: #16a34a;
+	color: #16a34a;
+}
+
+.ce-share-label {
+	font-size: 0.85rem;
 }
 
 /* -------------------------------------------------------------------------
