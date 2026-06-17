@@ -2,6 +2,11 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.7.26
+
+### Fixed
+- Calendar loading spinner now appears immediately on page load, before FullCalendar initialises, rather than only after the grid has rendered
+
 ## 1.7.25
 
 ### Added
