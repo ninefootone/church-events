@@ -325,9 +325,19 @@
 
 		if ( metaOpen ) html += '</div>';
 
-		if ( cfg.interaction === 'page' && event.event_url ) {
-			html += '<div class="ce-modal-footer"><a href="' + event.event_url
-				+ '" class="ce-btn ce-btn-primary">' + cfg.i18n.viewDetails + '</a></div>';
+		if ( event.event_url ) {
+			var footerHtml = '<div class="ce-modal-footer">';
+			if ( cfg.interaction === 'page' ) {
+				footerHtml += '<a href="' + event.event_url
+					+ '" class="ce-btn ce-btn-primary">' + cfg.i18n.viewDetails + '</a>';
+			}
+			footerHtml += '<div class="ce-modal-share">'
+				+ '<span class="ce-share-label">Share:</span>'
+				+ '<input class="ce-share-input" type="text" readonly value="' + event.event_url + '" />'
+				+ '<button class="ce-share-copy" data-url="' + event.event_url + '" aria-label="Copy link">Copy</button>'
+				+ '</div>'
+				+ '</div>';
+			html += footerHtml;
 		}
 
 		html += '</div>';
@@ -425,6 +435,27 @@
 		requestAnimationFrame( function() { overlay.classList.add( 'is-open' ); } );
 		this.closeBtn && this.closeBtn.focus();
 		document.body.style.overflow = 'hidden';
+
+		var copyBtn = this.content.querySelector( '.ce-share-copy' );
+		if ( copyBtn ) {
+			copyBtn.addEventListener( 'click', function() {
+				var url = copyBtn.dataset.url;
+				if ( navigator.clipboard && navigator.clipboard.writeText ) {
+					navigator.clipboard.writeText( url ).then( function() {
+						copyBtn.textContent = 'Copied!';
+						setTimeout( function() { copyBtn.textContent = 'Copy'; }, 2000 );
+					} );
+				} else {
+					var input = copyBtn.previousElementSibling;
+					if ( input ) {
+						input.select();
+						document.execCommand( 'copy' );
+						copyBtn.textContent = 'Copied!';
+						setTimeout( function() { copyBtn.textContent = 'Copy'; }, 2000 );
+					}
+				}
+			} );
+		}
 	};
 
 	EventModal.prototype.close = function() {

@@ -2,6 +2,11 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.7.16
+
+### Added
+- Share link in event modal: always-visible URL input with a copy-to-clipboard button, appearing alongside the existing "View Details" button when applicable.
+
 ## 1.7.15
 
 ### Added
