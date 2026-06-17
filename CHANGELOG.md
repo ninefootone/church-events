@@ -2,6 +2,11 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.7.24
+
+### Added
+- Category pill also overlaid on modal featured image
+
 ## 1.7.23
 
 ### Added

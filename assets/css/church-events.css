@@ -473,6 +473,7 @@
 }
 
 .ce-modal-image {
+	position: relative;
 	border-radius: var( --ce-modal-radius ) var( --ce-modal-radius ) 0 0;
 	overflow: hidden;
 }

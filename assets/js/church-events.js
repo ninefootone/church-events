@@ -329,8 +329,22 @@
 		let html = '', metaOpen = false;
 
 		if ( fields.indexOf( 'featured_image' ) !== -1 && event.featured_image_url ) {
-			html += '<div class="ce-modal-image"><img src="' + event.featured_image_url
-				+ '" alt="' + decodeEntities( ( event.title && event.title.rendered ) || '' ) + '" /></div>';
+			const cats = event.event_categories || [];
+			const pillHtml = cats.length
+				? '<div class="ce-card-image-pills">' +
+					cats.slice( 0, 1 ).map( function( c ) {
+						var style = c.color
+							? ' style="background-color:' + c.color + ';color:' + ceTextColorFor( c.color ) + ';"'
+							: '';
+						return '<span class="ce-category-tag"' + style + '>' + decodeEntities( c.name ) + '</span>';
+					} ).join( '' ) +
+					'</div>'
+				: '';
+			html += '<div class="ce-modal-image">'
+				+ '<img src="' + event.featured_image_url
+				+ '" alt="' + decodeEntities( ( event.title && event.title.rendered ) || '' ) + '" />'
+				+ pillHtml
+				+ '</div>';
 		}
 
 		html += '<div class="ce-modal-body">';
