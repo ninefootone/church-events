@@ -758,6 +758,15 @@
 			eventMouseLeave: function() {
 				if ( cfg.hoverPreview && self.hover ) self.hover.hide();
 			},
+		loading: function( isLoading ) {
+			var el = self.el;
+			if ( ! el ) return;
+			if ( isLoading ) {
+				el.classList.add( 'ce-calendar-loading' );
+			} else {
+				el.classList.remove( 'ce-calendar-loading' );
+			}
+		},
 		} );
 
 		this.calendar.render();

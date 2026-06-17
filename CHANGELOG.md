@@ -2,6 +2,11 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.7.25
+
+### Added
+- Calendar grid view now shows a spinner (top-right) while events are loading
+
 ## 1.7.24
 
 ### Added
