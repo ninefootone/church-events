@@ -707,20 +707,23 @@
 }
 
 .ce-share-btn {
-	display:      flex;
-	align-items:  center;
-	gap:          0.4rem;
-	padding:      0.3rem 0;
-	border:       none;
-	background:   transparent;
-	color:        var( --ce-text-muted, #6b7280 );
-	cursor:       pointer;
-	font-size:    0.85rem;
-	transition:   color 0.15s;
+	display:       flex;
+	align-items:   center;
+	gap:           0.4rem;
+	padding:       0;
+	border:        none;
+	border-radius: 0;
+	background:    none !important;
+	box-shadow:    none !important;
+	color:         inherit;
+	cursor:        pointer;
+	font-size:     0.85rem;
+	transition:    opacity 0.15s;
 }
 
 .ce-share-btn:hover {
-	color: var( --ce-accent, #2563eb );
+	background: none !important;
+	opacity:    0.7;
 }
 
 .ce-share-btn.is-copied {

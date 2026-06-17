@@ -2,6 +2,11 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.7.19
+
+### Fixed
+- Modal share button no longer inherits theme button background styles.
+
 ## 1.7.18
 
 ### Changed
