@@ -2,6 +2,11 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.7.20
+
+### Fixed
+- Modal share button colour now uses CSS custom properties with dark fallback rather than inheriting theme button colour.
+
 ## 1.7.19
 
 ### Fixed
