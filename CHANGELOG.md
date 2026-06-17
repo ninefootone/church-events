@@ -2,6 +2,20 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.7.23
+
+### Added
+- Cards view: first category now renders as a coloured pill overlaid on the featured image (top-left), inheriting category colour and luminance-aware text colour
+- Pill also renders over the no-image placeholder when no featured image is set
+
+### Changed
+- Categories suppressed from card body to prevent double rendering
+
+## 1.7.22
+
+### Changed
+- Location and time meta items on event cards now include an explicit icon span (`ce-meta-icon`) to allow site-level CSS
+
 ## 1.7.21
 
 ### Added

@@ -285,13 +285,33 @@
 		let html = '', metaOpen = false;
 
 		if ( fields.indexOf( 'featured_image' ) !== -1 ) {
-			html += renderField( 'featured_image', event, 'archive' );
+			const cats = event.event_categories || [];
+			const pillHtml = cats.length
+				? '<div class="ce-card-image-pills">' +
+					cats.map( function( c ) {
+						var style = c.color
+							? ' style="background-color:' + c.color + ';color:' + ceTextColorFor( c.color ) + ';"'
+							: '';
+						return '<span class="ce-category-tag"' + style + '>' + decodeEntities( c.name ) + '</span>';
+					} ).join( '' ) +
+					'</div>'
+				: '';
+
+			if ( event.featured_image_url ) {
+				html += '<div class="ce-card-image">'
+					+ '<img src="' + event.featured_image_url + '" alt="' + escHtml( event.title && event.title.rendered || '' ) + '" loading="lazy" />'
+					+ pillHtml
+					+ '</div>';
+			} else {
+				html += '<div class="ce-card-no-image">' + pillHtml + '</div>';
+			}
 		}
 
 		html += '<div class="ce-card-body">';
 
 		fields.forEach( function( key ) {
 			if ( key === 'featured_image' ) return;
+			if ( key === 'categories' ) return;
 			const isMeta = metaFields.indexOf( key ) !== -1;
 			if ( isMeta && ! metaOpen )  { html += '<div class="ce-card-meta">'; metaOpen = true;  }
 			if ( ! isMeta && metaOpen )  { html += '</div>';                      metaOpen = false; }
