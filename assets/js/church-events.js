@@ -228,12 +228,12 @@
 				const et = meta.end_time ? formatTime( meta.end_time ) : '';
 				const ts = et ? st + ' \u2013 ' + et : st;
 				if ( ! ts ) return '';
-				return '<span class="ce-card-meta-item ce-meta-time">' + ts + '</span>';
+				return '<span class="ce-card-meta-item ce-meta-time"><span class="ce-meta-icon" aria-hidden="true"></span>' + ts + '</span>';
 			}
 
 			case 'location':
 				if ( ! meta.location ) return '';
-				return '<span class="ce-card-meta-item ce-meta-location">' + escHtml( meta.location ) + '</span>';
+				return '<span class="ce-card-meta-item ce-meta-location"><span class="ce-meta-icon" aria-hidden="true"></span>' + escHtml( meta.location ) + '</span>';
 
 			case 'address':
 				if ( ! meta.address ) return '';
