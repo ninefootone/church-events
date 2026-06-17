@@ -171,6 +171,13 @@ function ce_rest_expose_meta() {
 		},
 		'schema' => null,
 	) );
+
+	register_rest_field( 'event', 'event_featured', array(
+		'get_callback' => function( $post ) {
+			return has_term( 'featured', 'event-featured', $post['id'] );
+		},
+		'schema' => null,
+	) );
 }
 add_action( 'rest_api_init', 'ce_rest_expose_meta' );
 

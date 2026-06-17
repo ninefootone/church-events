@@ -2,6 +2,11 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.7.21
+
+### Added
+- Featured events now carry a `ce-featured` CSS class on their card and agenda/list items, allowing custom styling of featured events in those views. Exposed via a new `event_featured` REST field.
+
 ## 1.7.20
 
 ### Fixed

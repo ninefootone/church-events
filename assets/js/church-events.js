@@ -610,7 +610,7 @@
 		events.forEach( function( event ) {
 			if ( isAgenda ) {
 				var row        = document.createElement( 'div' );
-				row.className  = 'ce-agenda-row';
+				row.className  = 'ce-agenda-row' + ( event.event_featured ? ' ce-featured' : '' );
 				row.innerHTML  = buildAgendaRow( event );
 				row.dataset.id = event.id;
 
@@ -625,7 +625,7 @@
 				wrapper.appendChild( row );
 			} else {
 				var card         = document.createElement( 'article' );
-				card.className   = 'ce-event-card';
+				card.className   = 'ce-event-card' + ( event.event_featured ? ' ce-featured' : '' );
 				card.innerHTML   = buildCard( event, fields );
 				card.dataset.id  = event.id;
 
