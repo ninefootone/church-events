@@ -2,6 +2,11 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.7.27 — 2026-06-19
+
+### Added
+- Native Elementor Dynamic Tags for all event fields, grouped under "Church Events" in the Elementor dynamic tags panel. Eliminates the implicit ACF dependency for formatted date display in Elementor single event templates. Includes formatted Start Date, End Date, and Date Range tags (respecting WordPress date format setting), plus Start Time, End Time, Location, Address, Map Address, Booking URL, Booking Link Text, Signup Enabled, All Day, ChurchSuite ID, and ChurchSuite Category.
+
 ## 1.7.26
 
 ### Fixed
