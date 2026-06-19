@@ -52,10 +52,10 @@ class Church_Events {
 		require_once CE_PLUGIN_DIR . 'admin/settings.php';
 		require_once CE_PLUGIN_DIR . 'admin/ajax.php';
 
-		// Elementor dynamic tags — loaded only when Elementor is active.
-		if ( defined( 'ELEMENTOR_VERSION' ) ) {
+		// Elementor dynamic tags — loaded after Elementor initialises its classes.
+		add_action( 'elementor/loaded', function() {
 			require_once CE_PLUGIN_DIR . 'includes/elementor-tags.php';
-		}
+		} );
 	}
 
 	/**
