@@ -257,6 +257,8 @@ function ce_shortcode_list( $atts ) {
 		'columns'  => ce_get_option( 'grid_columns', 3 ),
 		'site'     => '',
 		'category' => '',
+		'limit'    => 0,         // hard cap on cards/rows; also suppresses Load More. 0 = use per_page.
+		'controls' => 'on',      // 'off' | 'false' | 'no' | '0' hides the toolbar (search/filters/toggle)
 		// Legacy alias — honoured so existing shortcodes keep working
 		'view'     => '',
 	), $atts, 'church_events_list' );
@@ -270,6 +272,9 @@ function ce_shortcode_list( $atts ) {
 
 	$data_site     = $atts['site']     ? ' data-locked-site="' . esc_attr( $atts['site'] ) . '"' : '';
 	$data_category = $atts['category'] ? ' data-locked-category="' . esc_attr( $atts['category'] ) . '"' : '';
+	$limit         = max( 0, (int) $atts['limit'] );
+	$data_limit    = $limit > 0 ? ' data-limit="' . esc_attr( $limit ) . '"' : '';
+	$show_controls = ! in_array( strtolower( (string) $atts['controls'] ), array( 'off', 'false', 'no', '0' ), true );
 
 	ob_start();
 
@@ -277,7 +282,7 @@ function ce_shortcode_list( $atts ) {
 		$enabled_views = array( 'calendar' );
 		?>
 		<div class="church-events" data-ce-root data-default-view="calendar"<?php echo $data_site . $data_category; ?>>
-			<?php ce_render_toolbar( $enabled_views, 'calendar', $atts['site'], $atts['category'] ); ?>
+			<?php if ( $show_controls ) ce_render_toolbar( $enabled_views, 'calendar', $atts['site'], $atts['category'] ); ?>
 			<div class="ce-views">
 				<div class="ce-view ce-view--calendar is-active" aria-label="<?php esc_attr_e( 'Calendar view', 'church-events' ); ?>">
 					<div id="ce-calendar" class="ce-calendar-container"></div>
@@ -289,9 +294,9 @@ function ce_shortcode_list( $atts ) {
 		<?php
 	} else {
 		?>
-		<div class="church-events" data-ce-root data-default-view="<?php echo esc_attr( $layout ); ?>" data-columns="<?php echo esc_attr( $atts['columns'] ); ?>"<?php echo $data_site . $data_category; ?>>
+		<div class="church-events" data-ce-root data-default-view="<?php echo esc_attr( $layout ); ?>" data-columns="<?php echo esc_attr( $atts['columns'] ); ?>"<?php echo $data_site . $data_category . $data_limit; ?>>
 
-			<?php ce_render_toolbar( array( $layout ), $layout, $atts['site'], $atts['category'] ); ?>
+			<?php if ( $show_controls ) ce_render_toolbar( array( $layout ), $layout, $atts['site'], $atts['category'] ); ?>
 
 			<?php if ( $layout === 'cards' ) : ?>
 			<div class="ce-view ce-view--cards is-active" aria-label="<?php esc_attr_e( 'Cards view', 'church-events' ); ?>">

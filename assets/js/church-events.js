@@ -584,6 +584,7 @@
 
 	ListView.prototype.load = async function( filters, append ) {
 		this.filters = filters;
+		this.limit   = parseInt( this.root.dataset.limit, 10 ) || 0;
 
 		if ( ! append ) {
 			this.currentPage = 1;
@@ -594,7 +595,7 @@
 		}
 
 		try {
-			const result = await fetchEventPage( filters, this.currentPage );
+			const result = await fetchEventPage( filters, this.currentPage, this.limit || undefined );
 			this.totalPages = result.totalPages;
 			this.render( result.events, append );
 		} catch ( e ) {
@@ -675,8 +676,8 @@
 			}
 		} );
 
-		// Load more button
-		if ( this.currentPage < this.totalPages ) {
+		// Load more button — suppressed when a hard limit is set
+		if ( ! this.limit && this.currentPage < this.totalPages ) {
 			var self       = this;
 			var wrap       = document.createElement( 'div' );
 			wrap.className = 'ce-load-more-wrap';

@@ -2,6 +2,12 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.7.29
+
+### Added
+- `[church_events_list]` now accepts `limit="N"` to cap the number of cards/rows shown. A limit also suppresses the Load More button, giving a fixed block of the next N upcoming events — intended for homepage "what's on" sections.
+- `[church_events_list]` now accepts `controls="off"` (also `false`/`no`/`0`) to hide the entire toolbar (search, category/site/month filters, and view toggle). Applies to both the cards/list and calendar layouts of this shortcode.
+
 ## 1.7.28
 
 ### Added
