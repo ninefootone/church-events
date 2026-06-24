@@ -2,6 +2,11 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.7.30
+
+### Fixed
+- Cards and list views could show a different, incomplete set of events on each load. The REST ordering lacked a unique tiebreaker, so events sharing the same start date and time were returned in an undefined order, which broke pagination (missing and duplicated events). Added post ID as a final sort key for a stable, deterministic order. The calendar grid was unaffected because it fetches all events in range in a single request.
+
 ## 1.7.29
 
 ### Added

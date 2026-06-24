@@ -94,6 +94,7 @@ function ce_rest_event_query( $args, $request ) {
 	$args['orderby'] = array(
 		'ce_order_date' => 'ASC',
 		'ce_order_time' => 'ASC',
+		'ID'            => 'ASC',
 	);
 
 	return $args;
