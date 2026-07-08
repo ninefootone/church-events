@@ -49,6 +49,7 @@ class Church_Events {
 		require_once CE_PLUGIN_DIR . 'includes/importer-churchsuite.php';
 		require_once CE_PLUGIN_DIR . 'includes/importer-google.php';
 		require_once CE_PLUGIN_DIR . 'includes/sync-monitor.php';
+		require_once CE_PLUGIN_DIR . 'includes/elementor-featured-query.php';
 		require_once CE_PLUGIN_DIR . 'admin/settings.php';
 		require_once CE_PLUGIN_DIR . 'admin/ajax.php';
 

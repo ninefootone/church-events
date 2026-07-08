@@ -2,6 +2,11 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.7.31
+
+### Added
+- Elementor Loop Grid support for featured events. Set a Loop Grid or Posts widget's Query ID to `featured_events` to show upcoming featured events (today onwards) ordered by event start date rather than publish date.
+
 ## 1.7.30
 
 ### Fixed
