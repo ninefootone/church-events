@@ -520,6 +520,27 @@
 	font-size: var( --ce-font-size-meta );
 }
 
+/* Reserve calendar height during load so the layout doesn't collapse
+   and the footer doesn't jump. Centres the spinner in that space. */
+.ce-calendar-container {
+	min-height: 640px;
+}
+
+.ce-calendar-container > .ce-loading {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	min-height: 640px;
+}
+
+@media ( max-width: 768px ) {
+	.ce-calendar-container,
+	.ce-calendar-container > .ce-loading {
+		min-height: 520px;
+	}
+}
+
 .ce-calendar-loading {
 	position: relative;
 }

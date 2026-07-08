@@ -2,6 +2,14 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.7.32
+
+### Fixed
+- Calendar area no longer collapses to zero height while loading, which caused the page footer to jump up and then be pushed back down when the grid appeared. The calendar container now reserves its height and the loading spinner is actually visible during the wait. The 1.7.26 fix hadn't taken effect for the `[church_events_calendar]` shortcode: its default view rendered without `is-active` (so it stayed `display:none`), and the spinner's container was only activated at the end of init — after the category and month filter fetches had completed.
+
+### Changed
+- The default view now paints before the filter dropdowns are populated. Previously first paint was gated behind the category and month population requests (one of which paginates); these now run after the calendar renders, since they don't affect it.
+
 ## 1.7.31
 
 ### Added

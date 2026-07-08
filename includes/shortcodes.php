@@ -217,7 +217,7 @@ function ce_shortcode_calendar( $atts ) {
 		<div class="ce-views">
 
 			<?php if ( in_array( 'calendar', $enabled_views, true ) ) : ?>
-			<div class="ce-view ce-view--calendar" aria-label="<?php esc_attr_e( 'Calendar view', 'church-events' ); ?>">
+			<div class="ce-view ce-view--calendar<?php echo ( $atts['default_view'] === 'calendar' ) ? ' is-active' : ''; ?>" aria-label="<?php esc_attr_e( 'Calendar view', 'church-events' ); ?>">
 				<div id="ce-calendar" class="ce-calendar-container"><div class="ce-loading"></div></div>
 			</div>
 			<?php endif; ?>

@@ -902,13 +902,17 @@
 	}
 
 	ChurchEvents.prototype.init = async function() {
+		// Paint the default view first so the calendar shows immediately,
+		// instead of waiting on the filter-population fetches below.
+		this.bindToolbar();
+		this.initViews();
+		this.handleResponsive();
+
+		// Populate filter dropdowns after first paint — these don't block rendering.
 		var catSelect   = this.root.querySelector( '.ce-filter-category' );
 		if ( catSelect ) await populateCategoryFilter( catSelect );
 		var monthSelect = this.root.querySelector( '.ce-filter-month' );
 		if ( monthSelect ) await populateMonthFilter( monthSelect );
-		this.bindToolbar();
-		this.initViews();
-		this.handleResponsive();
 	};
 
 	ChurchEvents.prototype.getListFilters = function() {
