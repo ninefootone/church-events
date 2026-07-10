@@ -446,9 +446,10 @@
 
 .church-events .ce-modal-close {
 	position: absolute;
-	top: 1rem;
-	right: 1rem;
-	background: var( --ce-primary );
+	top: 0.75rem;
+	right: 0.75rem;
+	z-index: 2;
+	background: #000000;
 	border: none;
 	outline: none;
 	font-size: 1.5rem;
@@ -464,11 +465,12 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	transition: color var( --ce-transition );
+	box-shadow: 0 1px 4px rgba( 0, 0, 0, 0.4 );
+	transition: background var( --ce-transition ), color var( --ce-transition );
 }
 
 .church-events .ce-modal-close:hover {
-	background: var( --ce-secondary );
+	background: #333333;
 	color: #ffffff;
 }
 

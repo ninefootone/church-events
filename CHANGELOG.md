@@ -2,6 +2,11 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.7.34
+
+### Fixed
+- Event modal close button was rendered behind the featured image (neither had a `z-index`, so the later image painted over it), making it invisible on events with an image. Added `z-index` so the button sits above the image. Restyled it as a black circle in the top-right corner overlapping the image, with a subtle shadow for legibility on any background.
+
 ## 1.7.33
 
 ### Added
