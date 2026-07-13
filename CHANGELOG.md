@@ -2,6 +2,11 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.7.36
+
+### Fixed
+- Featured badge in the "below title" position sat too low in card view — the top margin stacked with the card body's own spacing. Card view now uses `margin-bottom` only; agenda/list and modal keep the full spacing above and below.
+
 ## 1.7.35
 
 ### Added

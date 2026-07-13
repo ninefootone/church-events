@@ -967,7 +967,8 @@
 }
 
 .ce-featured-badge--above { margin-bottom: 6px; }
-.ce-featured-badge--below { margin-top: 6px; }
+.ce-featured-badge--below { margin: 6px 0; }
+.ce-event-card .ce-featured-badge--below { margin-top: 0; }
 
 .ce-agenda-meta {
 	display: flex;
