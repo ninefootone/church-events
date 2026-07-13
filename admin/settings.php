@@ -163,6 +163,9 @@ function ce_sanitize_settings( $input ) {
 	$sanitized['featured_badge_bg'] = isset( $input['featured_badge_bg'] ) ? ( sanitize_hex_color( $input['featured_badge_bg'] ) ?: ( $sanitized['featured_badge_bg'] ?? '#000000' ) ) : ( $sanitized['featured_badge_bg'] ?? '#000000' );
 	$sanitized['featured_badge_fg'] = isset( $input['featured_badge_fg'] ) ? ( sanitize_hex_color( $input['featured_badge_fg'] ) ?: ( $sanitized['featured_badge_fg'] ?? '#ffffff' ) ) : ( $sanitized['featured_badge_fg'] ?? '#ffffff' );
 
+	// Category pill placement
+	$sanitized['category_pill_position'] = ( isset( $input['category_pill_position'] ) && in_array( $input['category_pill_position'], array( 'image', 'above', 'below' ), true ) ) ? $input['category_pill_position'] : ( $sanitized['category_pill_position'] ?? 'image' );
+
 	// Fields — archive (serialized order + visibility)
 	$sanitized['archive_fields']   = isset( $input['archive_fields'] )   ? ce_sanitize_fields_config( $input['archive_fields'] )                                                : ( $sanitized['archive_fields']   ?? ce_default_archive_fields() );
 
@@ -701,6 +704,26 @@ function ce_render_tab_display( $s ) {
 					<?php esc_html_e( 'Text', 'church-events' ); ?>
 					<input type="text" name="ce_settings[featured_badge_fg]" value="<?php echo esc_attr( $fb_fg ); ?>" class="ce-color-picker" />
 				</label>
+			</td>
+		</tr>
+
+		<tr>
+			<th><?php esc_html_e( 'Category Pill', 'church-events' ); ?></th>
+			<td>
+				<?php $cp_pos = isset( $s['category_pill_position'] ) ? $s['category_pill_position'] : 'image'; ?>
+				<label style="margin-right:16px;">
+					<input type="radio" name="ce_settings[category_pill_position]" value="image" <?php checked( $cp_pos, 'image' ); ?> />
+					<?php esc_html_e( 'Over the image (default)', 'church-events' ); ?>
+				</label>
+				<label style="margin-right:16px;">
+					<input type="radio" name="ce_settings[category_pill_position]" value="above" <?php checked( $cp_pos, 'above' ); ?> />
+					<?php esc_html_e( 'Above title', 'church-events' ); ?>
+				</label>
+				<label>
+					<input type="radio" name="ce_settings[category_pill_position]" value="below" <?php checked( $cp_pos, 'below' ); ?> />
+					<?php esc_html_e( 'Below title', 'church-events' ); ?>
+				</label>
+				<p class="description"><?php esc_html_e( 'Where the category pill shows on cards, list rows and the detail modal. Above/below places it on the same row as the featured badge, sized to match. The list view has no image, so it only shows a pill in the above/below positions.', 'church-events' ); ?></p>
 			</td>
 		</tr>
 	</table>

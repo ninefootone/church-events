@@ -165,6 +165,9 @@ function ce_build_js_config() {
 			'label'    => ce_get_option( 'featured_badge_label', __( 'Featured', 'church-events' ) ),
 			'position' => ce_get_option( 'featured_badge_position', 'above' ),
 		),
+		'categoryPill'    => array(
+			'position' => ce_get_option( 'category_pill_position', 'image' ),
+		),
 		'gridColumns'     => (int) ce_get_option( 'grid_columns', 3 ),
 		'imageRatio'      => ce_get_option( 'image_ratio', '16:9' ),
 		'archiveFields'   => $archive_fields,

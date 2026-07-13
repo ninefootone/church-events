@@ -2,6 +2,11 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.7.37
+
+### Added
+- New **Display → Category Pill** setting: show the category pill over the image (default, unchanged) or above/below the title, on the same row as the featured badge and sized to match. Applies to cards, list rows and the detail modal; over-image pills are suppressed when a title position is chosen.
+
 ## 1.7.36
 
 ### Fixed

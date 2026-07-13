@@ -53,10 +53,39 @@
 		return !! ( event && event.event_featured && cfg.featuredBadge && cfg.featuredBadge.enabled && cfg.featuredBadge.label );
 	}
 
-	function featuredBadgeHtml( event ) {
-		if ( ! showFeaturedBadge( event ) ) return '';
-		var pos = ( cfg.featuredBadge.position === 'below' ) ? 'below' : 'above';
-		return '<span class="ce-featured-badge ce-featured-badge--' + pos + '">' + escHtml( cfg.featuredBadge.label ) + '</span>';
+	function featuredBadgePosition() {
+		return ( cfg.featuredBadge && cfg.featuredBadge.position === 'below' ) ? 'below' : 'above';
+	}
+
+	function categoryPillPosition() {
+		return ( cfg.categoryPill && cfg.categoryPill.position ) ? cfg.categoryPill.position : 'image';
+	}
+
+	function firstCategory( event ) {
+		var cats = ( event && event.event_categories ) ? event.event_categories : [];
+		return cats.length ? cats[0] : null;
+	}
+
+	function categoryPillSpan( cat ) {
+		if ( ! cat ) return '';
+		var style = cat.color
+			? ' style="background-color:' + cat.color + ';color:' + ceTextColorFor( cat.color ) + ';"'
+			: '';
+		return '<span class="ce-category-tag ce-category-tag--badge"' + style + '>' + decodeEntities( cat.name ) + '</span>';
+	}
+
+	// Combined featured + category pill row for one side (above|below) of the title.
+	function titleBadgesHtml( event, side ) {
+		var parts = [];
+		if ( showFeaturedBadge( event ) && featuredBadgePosition() === side ) {
+			parts.push( '<span class="ce-featured-badge">' + escHtml( cfg.featuredBadge.label ) + '</span>' );
+		}
+		if ( categoryPillPosition() === side ) {
+			parts.push( categoryPillSpan( firstCategory( event ) ) );
+		}
+		parts = parts.filter( Boolean );
+		if ( ! parts.length ) return '';
+		return '<div class="ce-title-badges ce-title-badges--' + side + '">' + parts.join( '' ) + '</div>';
 	}
 
 	function formatDate( dateStr ) {
@@ -219,13 +248,10 @@
 				return '<div class="ce-card-image"><img src="' + event.featured_image_url + '" alt="' + title + '" loading="lazy" /></div>';
 
 			case 'title': {
-				var tBadge = featuredBadgeHtml( event );
-				var tBelow = cfg.featuredBadge && cfg.featuredBadge.position === 'below';
-				var tTag   = ( context === 'detail' )
+				var tTag = ( context === 'detail' )
 					? '<h2 class="ce-modal-title">' + title + '</h2>'
 					: '<h3 class="ce-card-title">' + title + '</h3>';
-				if ( ! tBadge ) return tTag;
-				return tBelow ? ( tTag + tBadge ) : ( tBadge + tTag );
+				return titleBadgesHtml( event, 'above' ) + tTag + titleBadgesHtml( event, 'below' );
 			}
 
 			case 'date': {
@@ -302,7 +328,7 @@
 
 		if ( fields.indexOf( 'featured_image' ) !== -1 ) {
 			const cats = event.event_categories || [];
-			const pillHtml = cats.length
+			const pillHtml = ( categoryPillPosition() === 'image' && cats.length )
 				? '<div class="ce-card-image-pills">' +
 					cats.map( function( c ) {
 						var style = c.color
@@ -346,7 +372,7 @@
 
 		if ( fields.indexOf( 'featured_image' ) !== -1 && event.featured_image_url ) {
 			const cats = event.event_categories || [];
-			const pillHtml = cats.length
+			const pillHtml = ( categoryPillPosition() === 'image' && cats.length )
 				? '<div class="ce-card-image-pills">' +
 					cats.slice( 0, 1 ).map( function( c ) {
 						var style = c.color
@@ -450,10 +476,9 @@
 				+ '</div>';
 		}
 
-		var agBadge = featuredBadgeHtml( event );
-		var agBelow = cfg.featuredBadge && cfg.featuredBadge.position === 'below';
-		var agTitle = '<span class="ce-agenda-title">' + title + '</span>';
-		var agTitleBlock = agBadge ? ( agBelow ? agTitle + agBadge : agBadge + agTitle ) : agTitle;
+		var agTitleBlock = titleBadgesHtml( event, 'above' )
+			+ '<span class="ce-agenda-title">' + title + '</span>'
+			+ titleBadgesHtml( event, 'below' );
 
 		return '<div class="ce-agenda-date-col">' + dateHtml + '</div>'
 			+ '<div class="ce-agenda-detail-col">'
