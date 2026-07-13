@@ -49,6 +49,16 @@
 		} catch ( e ) { return '#'; }
 	}
 
+	function showFeaturedBadge( event ) {
+		return !! ( event && event.event_featured && cfg.featuredBadge && cfg.featuredBadge.enabled && cfg.featuredBadge.label );
+	}
+
+	function featuredBadgeHtml( event ) {
+		if ( ! showFeaturedBadge( event ) ) return '';
+		var pos = ( cfg.featuredBadge.position === 'below' ) ? 'below' : 'above';
+		return '<span class="ce-featured-badge ce-featured-badge--' + pos + '">' + escHtml( cfg.featuredBadge.label ) + '</span>';
+	}
+
 	function formatDate( dateStr ) {
 		if ( ! dateStr || dateStr.length < 8 ) return '';
 		const y = parseInt( dateStr.substring( 0, 4 ), 10 );
@@ -208,9 +218,15 @@
 				if ( ! event.featured_image_url ) return '';
 				return '<div class="ce-card-image"><img src="' + event.featured_image_url + '" alt="' + title + '" loading="lazy" /></div>';
 
-			case 'title':
-				if ( context === 'detail' ) return '<h2 class="ce-modal-title">' + title + '</h2>';
-				return '<h3 class="ce-card-title">' + title + '</h3>';
+			case 'title': {
+				var tBadge = featuredBadgeHtml( event );
+				var tBelow = cfg.featuredBadge && cfg.featuredBadge.position === 'below';
+				var tTag   = ( context === 'detail' )
+					? '<h2 class="ce-modal-title">' + title + '</h2>'
+					: '<h3 class="ce-card-title">' + title + '</h3>';
+				if ( ! tBadge ) return tTag;
+				return tBelow ? ( tTag + tBadge ) : ( tBadge + tTag );
+			}
 
 			case 'date': {
 				const ds = formatDate( meta.start_date );
@@ -434,9 +450,14 @@
 				+ '</div>';
 		}
 
+		var agBadge = featuredBadgeHtml( event );
+		var agBelow = cfg.featuredBadge && cfg.featuredBadge.position === 'below';
+		var agTitle = '<span class="ce-agenda-title">' + title + '</span>';
+		var agTitleBlock = agBadge ? ( agBelow ? agTitle + agBadge : agBadge + agTitle ) : agTitle;
+
 		return '<div class="ce-agenda-date-col">' + dateHtml + '</div>'
 			+ '<div class="ce-agenda-detail-col">'
-			+ '<span class="ce-agenda-title">' + title + '</span>'
+			+ agTitleBlock
 			+ timeLine
 			+ locationLine
 			+ '</div>'
@@ -524,6 +545,25 @@
 		this.titleEl.textContent = decodeEntities( ( event.title && event.title.rendered ) || '' );
 		this.metaEl.textContent  = [ formatDate( meta.start_date ), time, meta.location ]
 			.filter( Boolean ).join( ' \u00B7 ' );
+
+		var hpBadge = this.el.querySelector( '.ce-hover-preview-badge' );
+		if ( hpBadge ) {
+			if ( showFeaturedBadge( event ) ) {
+				hpBadge.textContent = cfg.featuredBadge.label;
+				hpBadge.hidden = false;
+				hpBadge.classList.remove( 'ce-featured-badge--above', 'ce-featured-badge--below' );
+				if ( cfg.featuredBadge.position === 'below' ) {
+					hpBadge.classList.add( 'ce-featured-badge--below' );
+					this.titleEl.parentNode.insertBefore( hpBadge, this.titleEl.nextSibling );
+				} else {
+					hpBadge.classList.add( 'ce-featured-badge--above' );
+					this.titleEl.parentNode.insertBefore( hpBadge, this.titleEl );
+				}
+			} else {
+				hpBadge.hidden = true;
+			}
+		}
+
 		this.el.hidden = false;
 		this.position( anchor );
 		var el = this.el;

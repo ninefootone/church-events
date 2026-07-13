@@ -151,6 +151,18 @@ function ce_sanitize_settings( $input ) {
 	$sanitized['card_interaction'] = ( isset( $input['card_interaction'] ) )                                           ? sanitize_text_field( $input['card_interaction'] )      : ( $sanitized['card_interaction'] ?? 'modal' );
 	$sanitized['hover_preview']    = isset( $input['hover_preview'] )                                                  ? (bool) $input['hover_preview']                         : ( $sanitized['hover_preview']    ?? false   );
 
+	// Featured badge
+	$sanitized['featured_badge_enabled']  = isset( $input['featured_badge_enabled'] )  ? (bool) $input['featured_badge_enabled'] : ( $sanitized['featured_badge_enabled']  ?? true );
+	$sanitized['featured_badge_position'] = ( isset( $input['featured_badge_position'] ) && in_array( $input['featured_badge_position'], array( 'above', 'below' ), true ) ) ? $input['featured_badge_position'] : ( $sanitized['featured_badge_position'] ?? 'above' );
+	if ( isset( $input['featured_badge_label'] ) ) {
+		$fb_label = sanitize_text_field( $input['featured_badge_label'] );
+		$sanitized['featured_badge_label'] = ( $fb_label !== '' ) ? $fb_label : __( 'Featured', 'church-events' );
+	} else {
+		$sanitized['featured_badge_label'] = $sanitized['featured_badge_label'] ?? __( 'Featured', 'church-events' );
+	}
+	$sanitized['featured_badge_bg'] = isset( $input['featured_badge_bg'] ) ? ( sanitize_hex_color( $input['featured_badge_bg'] ) ?: ( $sanitized['featured_badge_bg'] ?? '#000000' ) ) : ( $sanitized['featured_badge_bg'] ?? '#000000' );
+	$sanitized['featured_badge_fg'] = isset( $input['featured_badge_fg'] ) ? ( sanitize_hex_color( $input['featured_badge_fg'] ) ?: ( $sanitized['featured_badge_fg'] ?? '#ffffff' ) ) : ( $sanitized['featured_badge_fg'] ?? '#ffffff' );
+
 	// Fields — archive (serialized order + visibility)
 	$sanitized['archive_fields']   = isset( $input['archive_fields'] )   ? ce_sanitize_fields_config( $input['archive_fields'] )                                                : ( $sanitized['archive_fields']   ?? ce_default_archive_fields() );
 
@@ -647,6 +659,48 @@ function ce_render_tab_display( $s ) {
 					<option value="1" <?php selected( $first_day, 1 ); ?>><?php esc_html_e( 'Monday', 'church-events' ); ?></option>
 					<option value="0" <?php selected( $first_day, 0 ); ?>><?php esc_html_e( 'Sunday', 'church-events' ); ?></option>
 				</select>
+			</td>
+		</tr>
+
+		<tr>
+			<th><?php esc_html_e( 'Featured Badge', 'church-events' ); ?></th>
+			<td>
+				<?php
+				$fb_enabled  = isset( $s['featured_badge_enabled'] )  ? (bool) $s['featured_badge_enabled'] : true;
+				$fb_position = isset( $s['featured_badge_position'] ) ? $s['featured_badge_position']       : 'above';
+				$fb_label    = isset( $s['featured_badge_label'] )    ? $s['featured_badge_label']          : __( 'Featured', 'church-events' );
+				$fb_bg       = isset( $s['featured_badge_bg'] )       ? $s['featured_badge_bg']             : '#000000';
+				$fb_fg       = isset( $s['featured_badge_fg'] )       ? $s['featured_badge_fg']             : '#ffffff';
+				?>
+				<input type="hidden" name="ce_settings[featured_badge_enabled]" value="0" />
+				<label>
+					<input type="checkbox" name="ce_settings[featured_badge_enabled]" value="1" <?php checked( $fb_enabled, true ); ?> />
+					<?php esc_html_e( 'Show a badge on events flagged as featured in ChurchSuite', 'church-events' ); ?>
+				</label>
+				<p class="description"><?php esc_html_e( 'Applies to card, list, detail modal and calendar hover views.', 'church-events' ); ?></p>
+
+				<p style="margin:12px 0 4px;"><strong><?php esc_html_e( 'Badge text', 'church-events' ); ?></strong></p>
+				<input type="text" name="ce_settings[featured_badge_label]" value="<?php echo esc_attr( $fb_label ); ?>" class="regular-text" placeholder="Featured" />
+
+				<p style="margin:12px 0 4px;"><strong><?php esc_html_e( 'Position', 'church-events' ); ?></strong></p>
+				<label style="margin-right:16px;">
+					<input type="radio" name="ce_settings[featured_badge_position]" value="above" <?php checked( $fb_position, 'above' ); ?> />
+					<?php esc_html_e( 'Above title', 'church-events' ); ?>
+				</label>
+				<label>
+					<input type="radio" name="ce_settings[featured_badge_position]" value="below" <?php checked( $fb_position, 'below' ); ?> />
+					<?php esc_html_e( 'Below title', 'church-events' ); ?>
+				</label>
+
+				<p style="margin:12px 0 4px;"><strong><?php esc_html_e( 'Colours', 'church-events' ); ?></strong></p>
+				<label style="margin-right:16px;">
+					<?php esc_html_e( 'Background', 'church-events' ); ?>
+					<input type="text" name="ce_settings[featured_badge_bg]" value="<?php echo esc_attr( $fb_bg ); ?>" class="ce-color-picker" />
+				</label>
+				<label>
+					<?php esc_html_e( 'Text', 'church-events' ); ?>
+					<input type="text" name="ce_settings[featured_badge_fg]" value="<?php echo esc_attr( $fb_fg ); ?>" class="ce-color-picker" />
+				</label>
 			</td>
 		</tr>
 	</table>

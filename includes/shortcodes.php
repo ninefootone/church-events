@@ -108,12 +108,18 @@ function ce_build_css_variables() {
 	$ratio     = ce_get_option( 'image_ratio', '16:9' );
 	$ratio_css = ce_ratio_to_padding( $ratio );
 
+	// Featured badge colours
+	$fb_bg = ce_get_option( 'featured_badge_bg', '#000000' );
+	$fb_fg = ce_get_option( 'featured_badge_fg', '#ffffff' );
+
 	return ".church-events {
 		--ce-primary: {$primary};
 		--ce-secondary: {$secondary};
 		--ce-text: {$text};
 		--ce-accent: {$accent};
 		--ce-image-ratio: {$ratio_css};
+		--ce-featured-bg: {$fb_bg};
+		--ce-featured-fg: {$fb_fg};
 	}";
 }
 
@@ -154,6 +160,11 @@ function ce_build_js_config() {
 		'mobileView'      => ce_get_option( 'mobile_view', '' ),
 		'interaction'     => ce_get_option( 'card_interaction', 'modal' ),
 		'hoverPreview'    => (bool) ce_get_option( 'hover_preview', false ),
+		'featuredBadge'   => array(
+			'enabled'  => (bool) ce_get_option( 'featured_badge_enabled', true ),
+			'label'    => ce_get_option( 'featured_badge_label', __( 'Featured', 'church-events' ) ),
+			'position' => ce_get_option( 'featured_badge_position', 'above' ),
+		),
 		'gridColumns'     => (int) ce_get_option( 'grid_columns', 3 ),
 		'imageRatio'      => ce_get_option( 'image_ratio', '16:9' ),
 		'archiveFields'   => $archive_fields,
@@ -463,6 +474,7 @@ function ce_render_hover_preview() {
 	if ( ! ce_get_option( 'hover_preview', false ) ) return;
 	?>
 	<div class="ce-hover-preview" aria-hidden="true" hidden>
+		<span class="ce-featured-badge ce-hover-preview-badge" hidden></span>
 		<div class="ce-hover-preview-title"></div>
 		<div class="ce-hover-preview-meta"></div>
 	</div>

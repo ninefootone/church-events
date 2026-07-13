@@ -2,6 +2,11 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.7.35
+
+### Added
+- Featured events now show a configurable badge, baked into the plugin across card, list, detail-modal and calendar-hover views, instead of relying on a per-site CSS `::before`. New **Display → Featured Badge** settings: show/hide (on by default), editable label text, position above or below the title, and background/text colour pickers. Colours are emitted as `--ce-featured-bg` / `--ce-featured-fg`.
+
 ## 1.7.34
 
 ### Fixed
