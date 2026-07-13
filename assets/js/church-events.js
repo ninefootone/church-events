@@ -571,23 +571,10 @@
 		this.metaEl.textContent  = [ formatDate( meta.start_date ), time, meta.location ]
 			.filter( Boolean ).join( ' \u00B7 ' );
 
-		var hpBadge = this.el.querySelector( '.ce-hover-preview-badge' );
-		if ( hpBadge ) {
-			if ( showFeaturedBadge( event ) ) {
-				hpBadge.textContent = cfg.featuredBadge.label;
-				hpBadge.hidden = false;
-				hpBadge.classList.remove( 'ce-featured-badge--above', 'ce-featured-badge--below' );
-				if ( cfg.featuredBadge.position === 'below' ) {
-					hpBadge.classList.add( 'ce-featured-badge--below' );
-					this.titleEl.parentNode.insertBefore( hpBadge, this.titleEl.nextSibling );
-				} else {
-					hpBadge.classList.add( 'ce-featured-badge--above' );
-					this.titleEl.parentNode.insertBefore( hpBadge, this.titleEl );
-				}
-			} else {
-				hpBadge.hidden = true;
-			}
-		}
+		var hpAbove = this.el.querySelector( '.ce-hover-preview-badges-above' );
+		var hpBelow = this.el.querySelector( '.ce-hover-preview-badges-below' );
+		if ( hpAbove ) hpAbove.innerHTML = titleBadgesHtml( event, 'above' );
+		if ( hpBelow ) hpBelow.innerHTML = titleBadgesHtml( event, 'below' );
 
 		this.el.hidden = false;
 		this.position( anchor );

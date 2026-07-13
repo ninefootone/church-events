@@ -477,8 +477,9 @@ function ce_render_hover_preview() {
 	if ( ! ce_get_option( 'hover_preview', false ) ) return;
 	?>
 	<div class="ce-hover-preview" aria-hidden="true" hidden>
-		<span class="ce-featured-badge ce-hover-preview-badge" hidden></span>
+		<div class="ce-hover-preview-badges-above"></div>
 		<div class="ce-hover-preview-title"></div>
+		<div class="ce-hover-preview-badges-below"></div>
 		<div class="ce-hover-preview-meta"></div>
 	</div>
 	<?php

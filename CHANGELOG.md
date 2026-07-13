@@ -2,6 +2,11 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.7.38
+
+### Fixed
+- The featured badge and category pill now appear in the calendar hover preview. The hover popover was on its own badge code path that the 1.7.37 category pill never reached; it now uses the same combined title-badge row as the card, list and modal views, honouring the position setting.
+
 ## 1.7.37
 
 ### Added
