@@ -2,6 +2,11 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.7.39
+
+### Fixed
+- Card view images were cropped from the top instead of the centre on Elementor themes. Elementor's `frontend.min.css` sets `.elementor img { height: auto }`, which has the same specificity as the plugin's `.ce-card-image img { height: 100% }` but loads later, so it overrode the height; `object-fit: cover` then had no fixed height to crop against and the image top-aligned. Card image `height` and `object-fit` are now `!important`, so the cover crop stays centred regardless of theme.
+
 ## 1.7.38
 
 ### Fixed
