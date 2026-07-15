@@ -45,6 +45,7 @@
 
 	/* Image ratios */
 	--ce-image-ratio:     56.25%; /* 16:9 default — overridden by PHP */
+	--ce-image-aspect:    16 / 9; /* 16:9 default — overridden by PHP */
 
 	/* Calendar */
 	--ce-calendar-height: 650px;
@@ -252,7 +253,7 @@
 .ce-card-image {
 	position: relative;
 	overflow: hidden;
-	padding-top: var( --ce-image-ratio );
+	aspect-ratio: var( --ce-image-aspect, 16 / 9 );
 }
 
 .ce-card-image img {
@@ -287,7 +288,7 @@
 
 .ce-card-no-image {
 	position: relative;
-	padding-top: var( --ce-image-ratio );
+	aspect-ratio: var( --ce-image-aspect, 16 / 9 );
 	background: var( --ce-primary );
 }
 

@@ -2,6 +2,11 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.7.41
+
+### Fixed
+- Card images could collapse to zero height on mobile inside Elementor flex/grid containers, shrinking the cards so the section below overlapped them. The images used a percentage `padding-top` aspect box, which iOS Safari can resolve against an unresolved/zero containing-block width during nested flex layout. Card image boxes now use the CSS `aspect-ratio` property (via a new `--ce-image-aspect` variable), which resolves against the element's own width and holds its height reliably — matching the approach already used for agenda thumbnails.
+
 ## 1.7.40
 
 ### Added

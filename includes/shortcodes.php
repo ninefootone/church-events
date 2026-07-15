@@ -104,9 +104,10 @@ function ce_build_css_variables() {
 		$accent    = ce_get_option( 'color_accent',    '#C1789C' );
 	}
 
-	// Image ratio to CSS padding-top percentage
-	$ratio     = ce_get_option( 'image_ratio', '16:9' );
-	$ratio_css = ce_ratio_to_padding( $ratio );
+	// Image ratio: padding-top percentage (legacy) + aspect-ratio value
+	$ratio        = ce_get_option( 'image_ratio', '16:9' );
+	$ratio_css    = ce_ratio_to_padding( $ratio );
+	$ratio_aspect = str_replace( ':', ' / ', $ratio ); // e.g. '16:9' -> '16 / 9'
 
 	// Featured badge colours
 	$fb_bg = ce_get_option( 'featured_badge_bg', '#000000' );
@@ -118,6 +119,7 @@ function ce_build_css_variables() {
 		--ce-text: {$text};
 		--ce-accent: {$accent};
 		--ce-image-ratio: {$ratio_css};
+		--ce-image-aspect: {$ratio_aspect};
 		--ce-featured-bg: {$fb_bg};
 		--ce-featured-fg: {$fb_fg};
 	}";
