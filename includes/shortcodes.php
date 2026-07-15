@@ -272,6 +272,7 @@ function ce_shortcode_list( $atts ) {
 		'site'     => '',
 		'category' => '',
 		'limit'    => 0,         // hard cap on cards/rows; also suppresses Load More. 0 = use per_page.
+		'featured' => '',        // 'true' | '1' | 'yes' | 'on' restricts to featured events only
 		'controls' => 'on',      // 'off' | 'false' | 'no' | '0' hides the toolbar (search/filters/toggle)
 		// Legacy alias — honoured so existing shortcodes keep working
 		'view'     => '',
@@ -286,6 +287,8 @@ function ce_shortcode_list( $atts ) {
 
 	$data_site     = $atts['site']     ? ' data-locked-site="' . esc_attr( $atts['site'] ) . '"' : '';
 	$data_category = $atts['category'] ? ' data-locked-category="' . esc_attr( $atts['category'] ) . '"' : '';
+	$is_featured   = in_array( strtolower( (string) $atts['featured'] ), array( 'true', '1', 'yes', 'on' ), true );
+	$data_featured = $is_featured ? ' data-locked-featured="1"' : '';
 	$limit         = max( 0, (int) $atts['limit'] );
 	$data_limit    = $limit > 0 ? ' data-limit="' . esc_attr( $limit ) . '"' : '';
 	$show_controls = ! in_array( strtolower( (string) $atts['controls'] ), array( 'off', 'false', 'no', '0' ), true );
@@ -308,7 +311,7 @@ function ce_shortcode_list( $atts ) {
 		<?php
 	} else {
 		?>
-		<div class="church-events" data-ce-root data-default-view="<?php echo esc_attr( $layout ); ?>" data-columns="<?php echo esc_attr( $atts['columns'] ); ?>"<?php echo $data_site . $data_category . $data_limit; ?>>
+		<div class="church-events" data-ce-root data-default-view="<?php echo esc_attr( $layout ); ?>" data-columns="<?php echo esc_attr( $atts['columns'] ); ?>"<?php echo $data_site . $data_category . $data_featured . $data_limit; ?>>
 
 			<?php if ( $show_controls ) ce_render_toolbar( array( $layout ), $layout, $atts['site'], $atts['category'] ); ?>
 

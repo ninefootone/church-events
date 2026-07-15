@@ -26,6 +26,7 @@ function ce_rest_event_query( $args, $request ) {
 		'event_category' => $request->get_param( 'event_category' ),
 		'event_site'     => $request->get_param( 'event_site' ),
 		'event_search'   => $request->get_param( 'event_search' ),
+		'event_featured' => $request->get_param( 'event_featured' ),
 	);
 
 	$cal_after  = $request->get_param( 'cal_after' );
@@ -33,6 +34,7 @@ function ce_rest_event_query( $args, $request ) {
 	$category   = $request->get_param( 'event_category' );
 	$site       = $request->get_param( 'event_site' );
 	$search     = $request->get_param( 'event_search' );
+	$featured   = $request->get_param( 'event_featured' );
 
 	// Date range filtering via meta BETWEEN query
 	if ( $cal_after && $cal_before ) {
@@ -67,6 +69,16 @@ function ce_rest_event_query( $args, $request ) {
 			'taxonomy' => 'event-site',
 			'field'    => 'slug',
 			'terms'    => sanitize_text_field( $site ),
+		);
+	}
+
+	// Featured filtering via taxonomy
+	if ( $featured ) {
+		$args['tax_query'] = isset( $args['tax_query'] ) ? $args['tax_query'] : array();
+		$args['tax_query'][] = array(
+			'taxonomy' => 'event-featured',
+			'field'    => 'slug',
+			'terms'    => 'featured',
 		);
 	}
 

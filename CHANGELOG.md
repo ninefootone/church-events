@@ -2,6 +2,11 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.7.40
+
+### Added
+- New `featured` attribute on `[church_events_list]`: `[church_events_list featured="true" layout="cards" controls="off"]` shows only featured events. Filtered server-side on the `event-featured` taxonomy, upcoming-only and date-sorted like the standard cards view, and cards open the detail modal on click. Intended as a shortcode replacement for the Elementor `featured_events` Loop Grid where modal-on-click is wanted.
+
 ## 1.7.39
 
 ### Fixed

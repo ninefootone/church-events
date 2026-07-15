@@ -165,6 +165,7 @@
 		if ( filters.category ) url += '&event_category=' + encodeURIComponent( filters.category );
 		if ( filters.site )     url += '&event_site='     + encodeURIComponent( filters.site );
 		if ( filters.search )   url += '&event_search='   + encodeURIComponent( filters.search );
+		if ( filters.featured ) url += '&event_featured=1';
 
 		const response = await fetch( url, { headers: { 'X-WP-Nonce': cfg.restNonce } } );
 		if ( ! response.ok ) return { events: [], total: 0, totalPages: 0 };
@@ -993,6 +994,7 @@
 			category: this.lockedCategory || this.activeCategory,
 			site:     this.lockedSite     || this.activeSite,
 			search:   this.activeSearch,
+			featured: this.root.dataset.lockedFeatured || '',
 		};
 	};
 
