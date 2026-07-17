@@ -2,6 +2,12 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.7.42
+
+### Added
+- `[church_events_list]` now takes `limit_tablet` and `limit_mobile` to show fewer cards on smaller screens, e.g. `columns="3" limit="3" limit_tablet="2"` for 3-up on desktop and 2-up on tablet/mobile. Applies per instance; the desktop `limit` still drives the fetch.
+- New **Interactions → Elementor Mobile Fix** setting (default on): ships the mobile overlap fix in the plugin, so nested Elementor flex containers no longer collapse the stacked cards on small screens. Removes the need for per-site CSS.
+
 ## 1.7.41
 
 ### Fixed

@@ -57,6 +57,12 @@ function ce_enqueue_frontend_assets() {
 		wp_add_inline_style( 'church-events', $custom_css );
 	}
 
+	// Elementor mobile layout fix (default on): stops nested Elementor flex
+	// containers collapsing the stacked cards on mobile. See ce_elementor_mobile_fix_css().
+	if ( ce_get_option( 'elementor_mobile_fix', true ) ) {
+		wp_add_inline_style( 'church-events', ce_elementor_mobile_fix_css() );
+	}
+
 	// FullCalendar from CDN — only if calendar shortcode is present
 	if ( $has_calendar ) {
 		wp_enqueue_script(
@@ -139,6 +145,49 @@ function ce_ratio_to_padding( $ratio ) {
 		'4:5'  => '125%',
 	);
 	return isset( $map[ $ratio ] ) ? $map[ $ratio ] : '56.25%';
+}
+
+/**
+ * Elementor mobile layout fix CSS.
+ *
+ * Nested Elementor flex-column containers can miscalculate the min-content
+ * height of the stacked cards on mobile and shrink the wrapper, so the cards
+ * overflow and the following section overlaps. Forcing the container that
+ * directly wraps a cards shortcode to block layout on mobile resolves it.
+ * Covers both full-width (.e-con) and boxed (.e-con-inner) containers.
+ *
+ * @return string
+ */
+function ce_elementor_mobile_fix_css() {
+	$sel = '.e-con:has(> .elementor-widget-shortcode .church-events[data-default-view="cards"]),'
+		 . '.e-con-inner:has(> .elementor-widget-shortcode .church-events[data-default-view="cards"])';
+	return '@media (max-width:768px){'
+		. $sel . '{display:block !important;}'
+		. '.e-con:has(> .elementor-widget-shortcode .church-events[data-default-view="cards"]) > .elementor-element:not(:last-child),'
+		. '.e-con-inner:has(> .elementor-widget-shortcode .church-events[data-default-view="cards"]) > .elementor-element:not(:last-child){margin-bottom:10px;}'
+		. '}';
+}
+
+/**
+ * Per-instance responsive card-count CSS.
+ *
+ * Hides cards beyond the tablet/mobile limits, scoped to one shortcode
+ * instance via its unique class. Fetch/desktop count stays driven by `limit`.
+ *
+ * @param string $uid    Unique instance class (e.g. 'ce-1a2b3c4d').
+ * @param int    $tablet Max cards at <=1024px (0 = no cap).
+ * @param int    $mobile Max cards at <=768px  (0 = no cap).
+ * @return string
+ */
+function ce_build_responsive_limit_css( $uid, $tablet, $mobile ) {
+	$css = '';
+	if ( $tablet > 0 ) {
+		$css .= '@media (max-width:1024px){.' . $uid . ' .ce-event-card:nth-child(n+' . ( $tablet + 1 ) . '){display:none !important;}}';
+	}
+	if ( $mobile > 0 ) {
+		$css .= '@media (max-width:768px){.' . $uid . ' .ce-event-card:nth-child(n+' . ( $mobile + 1 ) . '){display:none !important;}}';
+	}
+	return $css ? '<style>' . $css . '</style>' : '';
 }
 
 /**
@@ -274,6 +323,8 @@ function ce_shortcode_list( $atts ) {
 		'site'     => '',
 		'category' => '',
 		'limit'    => 0,         // hard cap on cards/rows; also suppresses Load More. 0 = use per_page.
+		'limit_tablet' => '',    // max cards shown at <=1024px; '' = same as limit
+		'limit_mobile' => '',    // max cards shown at <=768px;  '' = inherit tablet, else limit
 		'featured' => '',        // 'true' | '1' | 'yes' | 'on' restricts to featured events only
 		'controls' => 'on',      // 'off' | 'false' | 'no' | '0' hides the toolbar (search/filters/toggle)
 		// Legacy alias — honoured so existing shortcodes keep working
@@ -294,6 +345,10 @@ function ce_shortcode_list( $atts ) {
 	$limit         = max( 0, (int) $atts['limit'] );
 	$data_limit    = $limit > 0 ? ' data-limit="' . esc_attr( $limit ) . '"' : '';
 	$show_controls = ! in_array( strtolower( (string) $atts['controls'] ), array( 'off', 'false', 'no', '0' ), true );
+	$limit_tablet  = ( $atts['limit_tablet'] !== '' ) ? max( 0, (int) $atts['limit_tablet'] ) : 0;
+	$limit_mobile  = ( $atts['limit_mobile'] !== '' ) ? max( 0, (int) $atts['limit_mobile'] ) : 0;
+	$uid           = 'ce-' . substr( md5( uniqid( '', true ) ), 0, 8 );
+	$resp_css      = ce_build_responsive_limit_css( $uid, $limit_tablet, $limit_mobile );
 
 	ob_start();
 
@@ -313,7 +368,8 @@ function ce_shortcode_list( $atts ) {
 		<?php
 	} else {
 		?>
-		<div class="church-events" data-ce-root data-default-view="<?php echo esc_attr( $layout ); ?>" data-columns="<?php echo esc_attr( $atts['columns'] ); ?>"<?php echo $data_site . $data_category . $data_featured . $data_limit; ?>>
+		<?php echo $resp_css; ?>
+		<div class="church-events <?php echo esc_attr( $uid ); ?>" data-ce-root data-default-view="<?php echo esc_attr( $layout ); ?>" data-columns="<?php echo esc_attr( $atts['columns'] ); ?>"<?php echo $data_site . $data_category . $data_featured . $data_limit; ?>>
 
 			<?php if ( $show_controls ) ce_render_toolbar( array( $layout ), $layout, $atts['site'], $atts['category'] ); ?>
 

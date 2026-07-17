@@ -151,6 +151,9 @@ function ce_sanitize_settings( $input ) {
 	$sanitized['card_interaction'] = ( isset( $input['card_interaction'] ) )                                           ? sanitize_text_field( $input['card_interaction'] )      : ( $sanitized['card_interaction'] ?? 'modal' );
 	$sanitized['hover_preview']    = isset( $input['hover_preview'] )                                                  ? (bool) $input['hover_preview']                         : ( $sanitized['hover_preview']    ?? false   );
 
+	// Elementor mobile layout fix
+	$sanitized['elementor_mobile_fix'] = isset( $input['elementor_mobile_fix'] ) ? (bool) $input['elementor_mobile_fix'] : ( $sanitized['elementor_mobile_fix'] ?? true );
+
 	// Featured badge
 	$sanitized['featured_badge_enabled']  = isset( $input['featured_badge_enabled'] )  ? (bool) $input['featured_badge_enabled'] : ( $sanitized['featured_badge_enabled']  ?? true );
 	$sanitized['featured_badge_position'] = ( isset( $input['featured_badge_position'] ) && in_array( $input['featured_badge_position'], array( 'above', 'below' ), true ) ) ? $input['featured_badge_position'] : ( $sanitized['featured_badge_position'] ?? 'above' );
@@ -733,6 +736,7 @@ function ce_render_tab_display( $s ) {
 function ce_render_tab_interactions( $s ) {
 	$interaction = isset( $s['card_interaction'] ) ? $s['card_interaction'] : 'modal';
 	$hover       = isset( $s['hover_preview'] ) ? (bool) $s['hover_preview'] : false;
+	$emfix       = isset( $s['elementor_mobile_fix'] ) ? (bool) $s['elementor_mobile_fix'] : true;
 	?>
 	<h2><?php esc_html_e( 'Interaction Settings', 'church-events' ); ?></h2>
 
@@ -760,6 +764,18 @@ function ce_render_tab_interactions( $s ) {
 					<?php esc_html_e( 'Show event summary on hover (calendar grid only)', 'church-events' ); ?>
 				</label>
 				<p class="description"><?php esc_html_e( 'Displays a small popover with the event title, time and excerpt when hovering over an event.', 'church-events' ); ?></p>
+			</td>
+		</tr>
+
+		<tr>
+			<th><?php esc_html_e( 'Elementor Mobile Fix', 'church-events' ); ?></th>
+			<td>
+				<input type="hidden" name="ce_settings[elementor_mobile_fix]" value="0" />
+				<label>
+					<input type="checkbox" name="ce_settings[elementor_mobile_fix]" value="1" <?php checked( $emfix, true ); ?> />
+					<?php esc_html_e( 'Prevent card overlap inside Elementor containers on mobile', 'church-events' ); ?>
+				</label>
+				<p class="description"><?php esc_html_e( 'Fixes a layout issue where stacked cards can overflow their Elementor container on small screens, causing the section below to overlap. Leave on unless it conflicts with a custom layout.', 'church-events' ); ?></p>
 			</td>
 		</tr>
 	</table>
