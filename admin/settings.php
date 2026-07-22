@@ -81,6 +81,7 @@ function ce_sanitize_settings( $input ) {
 	$sanitized['google_cal_id']     = isset( $input['google_cal_id'] ) ? sanitize_text_field( $input['google_cal_id'] ) : ( $sanitized['google_cal_id'] ?? '' );
 	$sanitized['google_api_key']    = isset( $input['google_api_key'] ) ? sanitize_text_field( $input['google_api_key'] ) : ( $sanitized['google_api_key'] ?? '' );
 	$sanitized['sync_interval']     = isset( $input['sync_interval'] ) ? sanitize_text_field( $input['sync_interval'] ) : ( $sanitized['sync_interval'] ?? 'hourly' );
+	$sanitized['past_retention_months'] = ( isset( $input['past_retention_months'] ) && in_array( (int) $input['past_retention_months'], array( 1, 3, 6 ), true ) ) ? (int) $input['past_retention_months'] : ( $sanitized['past_retention_months'] ?? 1 );
 	$sanitized['sync_key'] = ! empty( $input['sync_key'] ) ? sanitize_text_field( $input['sync_key'] ) : ( $sanitized['sync_key'] ?? '' );
 	if ( ! empty( $sanitized['sync_key'] ) && strlen( $sanitized['sync_key'] ) < 32 ) {
 		add_settings_error( 'ce_settings', 'sync_key_weak', __( 'Server Cron Key should be at least 32 characters long. Consider using a randomly generated value.', 'church-events' ), 'warning' );
@@ -365,6 +366,7 @@ function ce_render_tab_import( $s ) {
 	$gcal_id  = isset( $s['google_cal_id'] ) ? $s['google_cal_id'] : '';
 	$gcal_key = isset( $s['google_api_key'] ) ? $s['google_api_key'] : '';
 	$interval  = isset( $s['sync_interval'] ) ? $s['sync_interval'] : 'hourly';
+	$retention = isset( $s['past_retention_months'] ) ? (int) $s['past_retention_months'] : 1;
 	$sync_key  = isset( $s['sync_key'] ) ? $s['sync_key'] : '';
 	$last_sync = get_option( 'ce_last_sync_status', null );
 	?>
@@ -420,6 +422,18 @@ function ce_render_tab_import( $s ) {
 					<option value="daily" <?php selected( $interval, 'daily' ); ?>><?php esc_html_e( 'Daily', 'church-events' ); ?></option>
 				</select>
 				<p class="description"><?php esc_html_e( 'How often WP-Cron syncs events. For reliable timing, pair with a real server cron job.', 'church-events' ); ?></p>
+			</td>
+		</tr>
+
+		<tr>
+			<th><label for="ce_past_retention_months"><?php esc_html_e( 'Keep Past Events', 'church-events' ); ?></label></th>
+			<td>
+				<select id="ce_past_retention_months" name="ce_settings[past_retention_months]">
+					<option value="1" <?php selected( $retention, 1 ); ?>><?php esc_html_e( '1 month', 'church-events' ); ?></option>
+					<option value="3" <?php selected( $retention, 3 ); ?>><?php esc_html_e( '3 months', 'church-events' ); ?></option>
+					<option value="6" <?php selected( $retention, 6 ); ?>><?php esc_html_e( '6 months', 'church-events' ); ?></option>
+				</select>
+				<p class="description"><?php esc_html_e( 'How far back finished events stay on the calendar. Applies going forward — it does not restore events already removed.', 'church-events' ); ?></p>
 			</td>
 		</tr>
 

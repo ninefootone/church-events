@@ -646,7 +646,9 @@ function ce_trash_removed_events( $feed_identifiers ) {
 	$trashed = 0;
 
 	$today  = date( 'Ymd' );
-	$cutoff = date( 'Ymd', strtotime( '-1 month' ) );
+	$months = (int) ce_get_option( 'past_retention_months', 1 );
+	if ( ! in_array( $months, array( 1, 3, 6 ), true ) ) $months = 1;
+	$cutoff = date( 'Ymd', strtotime( '-' . $months . ' months' ) );
 
 	foreach ( $existing_posts as $post_id ) {
 		$identifier = get_post_meta( $post_id, 'event_churchsuite_id', true );
@@ -656,8 +658,8 @@ function ce_trash_removed_events( $feed_identifiers ) {
 
 		if ( ! in_array( $identifier, $feed_identifiers, true ) ) {
 
-			// Past events naturally drop out of the feed — keep them for
-			// 1 month so the calendar grid stays populated, then trash.
+			// Past events naturally drop out of the feed — keep them for the
+			// configured retention window so the calendar grid stays populated.
 			$start_date = get_post_meta( $post_id, 'event_start_date', true );
 			if ( ! empty( $start_date ) && $start_date < $today && $start_date >= $cutoff ) {
 				continue;

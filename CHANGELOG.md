@@ -2,6 +2,11 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.7.43
+
+### Added
+- New **Import → Keep Past Events** setting (1 / 3 / 6 months, default 1) controlling how far back finished events are retained on the calendar. Applies going forward; it does not restore events already trashed. The Google Calendar importer previously kept no past events at all — it now honours the same retention window as ChurchSuite.
+
 ## 1.7.42
 
 ### Added

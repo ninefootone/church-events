@@ -447,12 +447,25 @@ function ce_trash_removed_google_events( $feed_identifiers ) {
 
 	$trashed = 0;
 
+	$today  = date( 'Ymd' );
+	$months = (int) ce_get_option( 'past_retention_months', 1 );
+	if ( ! in_array( $months, array( 1, 3, 6 ), true ) ) $months = 1;
+	$cutoff = date( 'Ymd', strtotime( '-' . $months . ' months' ) );
+
 	foreach ( $existing_posts as $post_id ) {
 		$google_id = get_post_meta( $post_id, 'event_google_id', true );
 
 		if ( empty( $google_id ) ) continue;
 
 		if ( ! in_array( $google_id, $feed_identifiers, true ) ) {
+
+			// Past events naturally drop out of the feed — keep them for the
+			// configured retention window so the calendar grid stays populated.
+			$start_date = get_post_meta( $post_id, 'event_start_date', true );
+			if ( ! empty( $start_date ) && $start_date < $today && $start_date >= $cutoff ) {
+				continue;
+			}
+
 			wp_trash_post( $post_id );
 			ce_log( 'Trashed event no longer in Google Calendar feed: ' . get_the_title( $post_id ) . ' (' . $google_id . ')' );
 			$trashed++;
