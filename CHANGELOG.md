@@ -2,6 +2,11 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.7.45
+
+### Changed
+- Shortcodes settings tab now documents the `limit`, `limit_tablet`, `limit_mobile` and `featured` attributes on `[church_events_list]`, so the responsive card limits and featured-only filter are discoverable without checking the changelog.
+
 ## 1.7.44
 
 ### Fixed

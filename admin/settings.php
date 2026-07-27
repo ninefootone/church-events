@@ -995,6 +995,10 @@ function ce_render_tab_shortcodes() {
 					<code>layout="list"</code> <?php esc_html_e( '— agenda rows', 'church-events' ); ?><br>
 					<code>layout="calendar"</code> <?php esc_html_e( '— month grid', 'church-events' ); ?><br>
 					<code>columns="3"</code> <?php esc_html_e( '— grid column count (cards only)', 'church-events' ); ?><br>
+					<code>limit="6"</code> <?php esc_html_e( '— cap the number of cards/rows; also hides Load More (0 = no cap)', 'church-events' ); ?><br>
+					<code>limit_tablet="2"</code> <?php esc_html_e( '— fewer cards on tablet (blank = same as limit)', 'church-events' ); ?><br>
+					<code>limit_mobile="1"</code> <?php esc_html_e( '— fewer cards on mobile (blank = inherit tablet, else limit)', 'church-events' ); ?><br>
+					<code>featured="true"</code> <?php esc_html_e( '— only events flagged featured in ChurchSuite', 'church-events' ); ?><br>
 					<code>category="youth"</code><br>
 					<code>site="central"</code>
 				</td>
