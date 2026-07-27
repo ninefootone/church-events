@@ -2,6 +2,11 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.7.44
+
+### Fixed
+- ChurchSuite `pending` (and any other non-confirmed) events were being imported and shown publicly. The importer now only creates/updates events with status `confirmed`; any non-confirmed event already in the system is trashed on the next sync. A missing status is treated as confirmed so a feed change can't stop all imports.
+
 ## 1.7.43
 
 ### Added

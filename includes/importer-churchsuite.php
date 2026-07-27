@@ -249,6 +249,32 @@ function ce_upsert_churchsuite_event( $cs, $site_lookup = array() ) {
 	$identifier = sanitize_text_field( $cs['identifier'] );
 	$action     = 'imported';
 
+	// ---------------------------------------------------------------------------
+	// Skip non-confirmed events (e.g. 'pending' provisional bookings).
+	// ChurchSuite only treats 'confirmed' events as real; pending ones can move
+	// or be cancelled, so they must never appear on the public site. If an event
+	// that was previously imported has since flipped to non-confirmed, trash the
+	// existing post so it drops off the site on this sync.
+	// A missing/empty status is treated as confirmed, so a feed change can't
+	// silently stop everything importing.
+	// ---------------------------------------------------------------------------
+	$cs_status = isset( $cs['status'] )
+		? ( is_array( $cs['status'] ) ? ( $cs['status']['name'] ?? '' ) : $cs['status'] )
+		: '';
+	$cs_status = strtolower( trim( (string) $cs_status ) );
+
+	if ( $cs_status !== '' && $cs_status !== 'confirmed' ) {
+		$existing = ce_get_post_by_churchsuite_id( $identifier, $cs['id'] ?? null );
+		if ( $existing && 'trash' !== $existing->post_status ) {
+			wp_trash_post( $existing->ID );
+			ce_log( sprintf(
+				'Trashed non-confirmed (%s) event: %s (%s)',
+				$cs_status, $cs['name'] ?? '', $identifier
+			) );
+		}
+		return 'skipped';
+	}
+
 	// Check if post already exists by ChurchSuite identifier
 	$existing = ce_get_post_by_churchsuite_id( $identifier, $cs['id'] ?? null );
 	$post_id  = $existing ? $existing->ID : 0;
