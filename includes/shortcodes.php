@@ -119,6 +119,10 @@ function ce_build_css_variables() {
 	$fb_bg = ce_get_option( 'featured_badge_bg', '#000000' );
 	$fb_fg = ce_get_option( 'featured_badge_fg', '#ffffff' );
 
+	// Pending badge colours
+	$pb_bg = ce_get_option( 'pending_badge_bg', '#6b7280' );
+	$pb_fg = ce_get_option( 'pending_badge_fg', '#ffffff' );
+
 	return ".church-events {
 		--ce-primary: {$primary};
 		--ce-secondary: {$secondary};
@@ -128,6 +132,8 @@ function ce_build_css_variables() {
 		--ce-image-aspect: {$ratio_aspect};
 		--ce-featured-bg: {$fb_bg};
 		--ce-featured-fg: {$fb_fg};
+		--ce-pending-bg: {$pb_bg};
+		--ce-pending-fg: {$pb_fg};
 	}";
 }
 
@@ -215,6 +221,11 @@ function ce_build_js_config() {
 			'enabled'  => (bool) ce_get_option( 'featured_badge_enabled', true ),
 			'label'    => ce_get_option( 'featured_badge_label', __( 'Featured', 'church-events' ) ),
 			'position' => ce_get_option( 'featured_badge_position', 'above' ),
+		),
+		'pendingBadge'    => array(
+			'enabled'  => (bool) ce_get_option( 'show_pending_events', false ),
+			'label'    => ce_get_option( 'pending_badge_label', __( 'Provisional', 'church-events' ) ),
+			'position' => ce_get_option( 'pending_badge_position', 'above' ),
 		),
 		'categoryPill'    => array(
 			'position' => ce_get_option( 'category_pill_position', 'image' ),

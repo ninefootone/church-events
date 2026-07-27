@@ -972,6 +972,20 @@
 .ce-featured-badge--below { margin: 6px 0; }
 .ce-event-card .ce-featured-badge--below { margin-top: 0; }
 
+/* Pending (provisional) badge — mirrors the featured badge */
+.ce-pending-badge {
+	display: block;
+	width: fit-content;
+	line-height: 1.8;
+	background: var( --ce-pending-bg, #6b7280 );
+	color: var( --ce-pending-fg, #ffffff );
+	border-radius: 500px;
+	font-family: "Inter", sans-serif;
+	font-size: 10px;
+	font-weight: 700;
+	padding: 0 6px;
+}
+
 /* Featured + category pill row beside the title */
 .ce-title-badges {
 	display: flex;
@@ -983,6 +997,7 @@
 .ce-title-badges--below { margin: 6px 0; }
 .ce-event-card .ce-title-badges--below { margin-top: 0; }
 .ce-title-badges .ce-featured-badge { margin: 0; }
+.ce-title-badges .ce-pending-badge { margin: 0; }
 .ce-title-badges .ce-category-tag {
 	line-height: 1.8;
 	font-size: 10px;

@@ -2,6 +2,14 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.7.46
+
+### Added
+- Optional **Show pending events** setting (Display tab, default off). When enabled, ChurchSuite events with a *Pending* status are imported and clearly marked with a configurable "Provisional" badge on cards, list rows and the detail modal (label, colour and position all adjustable, mirroring the featured badge). The month-grid chips are left unmarked. The badge can't be disabled independently — showing pending events without the marker is deliberately not possible.
+
+### Changed
+- The 1.7.44 behaviour of always skipping pending events is now the *default-off* state of the new setting. With the setting off, nothing changes; with it on, pending events are imported. Cancelled events remain excluded either way, and the booking button is suppressed on pending events (ChurchSuite doesn't accept sign-ups while pending). Switching the setting takes effect on the next sync.
+
 ## 1.7.45
 
 ### Changed

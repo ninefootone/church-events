@@ -167,6 +167,19 @@ function ce_sanitize_settings( $input ) {
 	$sanitized['featured_badge_bg'] = isset( $input['featured_badge_bg'] ) ? ( sanitize_hex_color( $input['featured_badge_bg'] ) ?: ( $sanitized['featured_badge_bg'] ?? '#000000' ) ) : ( $sanitized['featured_badge_bg'] ?? '#000000' );
 	$sanitized['featured_badge_fg'] = isset( $input['featured_badge_fg'] ) ? ( sanitize_hex_color( $input['featured_badge_fg'] ) ?: ( $sanitized['featured_badge_fg'] ?? '#ffffff' ) ) : ( $sanitized['featured_badge_fg'] ?? '#ffffff' );
 
+	// Pending events (import + badge). Master toggle doubles as the badge switch —
+	// pending events are always marked when shown, never silently unlabelled.
+	$sanitized['show_pending_events']    = isset( $input['show_pending_events'] ) ? (bool) $input['show_pending_events'] : ( $sanitized['show_pending_events'] ?? false );
+	$sanitized['pending_badge_position'] = ( isset( $input['pending_badge_position'] ) && in_array( $input['pending_badge_position'], array( 'above', 'below' ), true ) ) ? $input['pending_badge_position'] : ( $sanitized['pending_badge_position'] ?? 'above' );
+	if ( isset( $input['pending_badge_label'] ) ) {
+		$pb_label = sanitize_text_field( $input['pending_badge_label'] );
+		$sanitized['pending_badge_label'] = ( $pb_label !== '' ) ? $pb_label : __( 'Provisional', 'church-events' );
+	} else {
+		$sanitized['pending_badge_label'] = $sanitized['pending_badge_label'] ?? __( 'Provisional', 'church-events' );
+	}
+	$sanitized['pending_badge_bg'] = isset( $input['pending_badge_bg'] ) ? ( sanitize_hex_color( $input['pending_badge_bg'] ) ?: ( $sanitized['pending_badge_bg'] ?? '#6b7280' ) ) : ( $sanitized['pending_badge_bg'] ?? '#6b7280' );
+	$sanitized['pending_badge_fg'] = isset( $input['pending_badge_fg'] ) ? ( sanitize_hex_color( $input['pending_badge_fg'] ) ?: ( $sanitized['pending_badge_fg'] ?? '#ffffff' ) ) : ( $sanitized['pending_badge_fg'] ?? '#ffffff' );
+
 	// Category pill placement
 	$sanitized['category_pill_position'] = ( isset( $input['category_pill_position'] ) && in_array( $input['category_pill_position'], array( 'image', 'above', 'below' ), true ) ) ? $input['category_pill_position'] : ( $sanitized['category_pill_position'] ?? 'image' );
 
@@ -720,6 +733,48 @@ function ce_render_tab_display( $s ) {
 				<label>
 					<?php esc_html_e( 'Text', 'church-events' ); ?>
 					<input type="text" name="ce_settings[featured_badge_fg]" value="<?php echo esc_attr( $fb_fg ); ?>" class="ce-color-picker" />
+				</label>
+			</td>
+		</tr>
+
+		<tr>
+			<th><?php esc_html_e( 'Pending Events', 'church-events' ); ?></th>
+			<td>
+				<?php
+				$pe_enabled  = isset( $s['show_pending_events'] )    ? (bool) $s['show_pending_events'] : false;
+				$pb_position = isset( $s['pending_badge_position'] ) ? $s['pending_badge_position']     : 'above';
+				$pb_label    = isset( $s['pending_badge_label'] )    ? $s['pending_badge_label']        : __( 'Provisional', 'church-events' );
+				$pb_bg       = isset( $s['pending_badge_bg'] )       ? $s['pending_badge_bg']           : '#6b7280';
+				$pb_fg       = isset( $s['pending_badge_fg'] )       ? $s['pending_badge_fg']           : '#ffffff';
+				?>
+				<input type="hidden" name="ce_settings[show_pending_events]" value="0" />
+				<label>
+					<input type="checkbox" name="ce_settings[show_pending_events]" value="1" <?php checked( $pe_enabled, true ); ?> />
+					<?php esc_html_e( 'Import and show ChurchSuite events with a "Pending" status', 'church-events' ); ?>
+				</label>
+				<p class="description"><?php esc_html_e( 'Off (default): pending events are not imported. On: pending events are imported and always marked with the badge below, so provisional dates are clearly flagged. Takes effect on the next sync. Cancelled events are never imported.', 'church-events' ); ?></p>
+
+				<p style="margin:12px 0 4px;"><strong><?php esc_html_e( 'Badge text', 'church-events' ); ?></strong></p>
+				<input type="text" name="ce_settings[pending_badge_label]" value="<?php echo esc_attr( $pb_label ); ?>" class="regular-text" placeholder="Provisional" />
+
+				<p style="margin:12px 0 4px;"><strong><?php esc_html_e( 'Position', 'church-events' ); ?></strong></p>
+				<label style="margin-right:16px;">
+					<input type="radio" name="ce_settings[pending_badge_position]" value="above" <?php checked( $pb_position, 'above' ); ?> />
+					<?php esc_html_e( 'Above title', 'church-events' ); ?>
+				</label>
+				<label>
+					<input type="radio" name="ce_settings[pending_badge_position]" value="below" <?php checked( $pb_position, 'below' ); ?> />
+					<?php esc_html_e( 'Below title', 'church-events' ); ?>
+				</label>
+
+				<p style="margin:12px 0 4px;"><strong><?php esc_html_e( 'Colours', 'church-events' ); ?></strong></p>
+				<label style="margin-right:16px;">
+					<?php esc_html_e( 'Background', 'church-events' ); ?>
+					<input type="text" name="ce_settings[pending_badge_bg]" value="<?php echo esc_attr( $pb_bg ); ?>" class="ce-color-picker" />
+				</label>
+				<label>
+					<?php esc_html_e( 'Text', 'church-events' ); ?>
+					<input type="text" name="ce_settings[pending_badge_fg]" value="<?php echo esc_attr( $pb_fg ); ?>" class="ce-color-picker" />
 				</label>
 			</td>
 		</tr>

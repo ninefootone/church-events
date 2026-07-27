@@ -132,6 +132,7 @@ function ce_rest_expose_meta() {
 				'address'      => get_post_meta( $post['id'], 'event_address', true ),
 				'booking_url'  => get_post_meta( $post['id'], 'event_booking_url', true ),
 				'booking_text' => get_post_meta( $post['id'], 'event_booking_text', true ),
+				'status'       => get_post_meta( $post['id'], 'event_status', true ),
 			);
 		},
 		'schema' => null,

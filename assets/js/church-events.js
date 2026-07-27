@@ -57,6 +57,15 @@
 		return ( cfg.featuredBadge && cfg.featuredBadge.position === 'below' ) ? 'below' : 'above';
 	}
 
+	function showPendingBadge( event ) {
+		var meta = ( event && event.event_meta ) || {};
+		return !! ( meta.status === 'pending' && cfg.pendingBadge && cfg.pendingBadge.enabled && cfg.pendingBadge.label );
+	}
+
+	function pendingBadgePosition() {
+		return ( cfg.pendingBadge && cfg.pendingBadge.position === 'below' ) ? 'below' : 'above';
+	}
+
 	function categoryPillPosition() {
 		return ( cfg.categoryPill && cfg.categoryPill.position ) ? cfg.categoryPill.position : 'image';
 	}
@@ -77,6 +86,9 @@
 	// Combined featured + category pill row for one side (above|below) of the title.
 	function titleBadgesHtml( event, side ) {
 		var parts = [];
+		if ( showPendingBadge( event ) && pendingBadgePosition() === side ) {
+			parts.push( '<span class="ce-pending-badge">' + escHtml( cfg.pendingBadge.label ) + '</span>' );
+		}
 		if ( showFeaturedBadge( event ) && featuredBadgePosition() === side ) {
 			parts.push( '<span class="ce-featured-badge">' + escHtml( cfg.featuredBadge.label ) + '</span>' );
 		}

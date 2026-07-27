@@ -250,25 +250,35 @@ function ce_upsert_churchsuite_event( $cs, $site_lookup = array() ) {
 	$action     = 'imported';
 
 	// ---------------------------------------------------------------------------
-	// Skip non-confirmed events (e.g. 'pending' provisional bookings).
-	// ChurchSuite only treats 'confirmed' events as real; pending ones can move
-	// or be cancelled, so they must never appear on the public site. If an event
-	// that was previously imported has since flipped to non-confirmed, trash the
-	// existing post so it drops off the site on this sync.
+	// Event status gating.
+	//   confirmed          → always imported
+	//   pending            → imported only when 'Show pending events' is on
+	//   anything else      → never imported (hard-filtered, e.g. cancelled)
 	// A missing/empty status is treated as confirmed, so a feed change can't
-	// silently stop everything importing.
+	// silently stop everything importing. When an already-imported event moves
+	// to a status we don't import (pending with the setting off, or cancelled),
+	// its existing post is trashed so it drops off the site on this sync. The
+	// resolved status is stored in meta ('event_status') so the front end can
+	// badge pending events.
 	// ---------------------------------------------------------------------------
 	$cs_status = isset( $cs['status'] )
 		? ( is_array( $cs['status'] ) ? ( $cs['status']['name'] ?? '' ) : $cs['status'] )
 		: '';
 	$cs_status = strtolower( trim( (string) $cs_status ) );
+	if ( $cs_status === '' ) {
+		$cs_status = 'confirmed';
+	}
 
-	if ( $cs_status !== '' && $cs_status !== 'confirmed' ) {
+	$ce_show_pending = (bool) ce_get_option( 'show_pending_events', false );
+	$ce_status_ok    = ( $cs_status === 'confirmed' )
+		|| ( $cs_status === 'pending' && $ce_show_pending );
+
+	if ( ! $ce_status_ok ) {
 		$existing = ce_get_post_by_churchsuite_id( $identifier, $cs['id'] ?? null );
 		if ( $existing && 'trash' !== $existing->post_status ) {
 			wp_trash_post( $existing->ID );
 			ce_log( sprintf(
-				'Trashed non-confirmed (%s) event: %s (%s)',
+				'Trashed non-imported (%s) event: %s (%s)',
 				$cs_status, $cs['name'] ?? '', $identifier
 			) );
 		}
@@ -351,6 +361,14 @@ function ce_upsert_churchsuite_event( $cs, $site_lookup = array() ) {
 		}
 	}
 
+	// Pending events never accept sign-ups in ChurchSuite, so drop any booking
+	// CTA — the existing $signup_enabled checks below then blank the booking meta.
+	if ( $cs_status === 'pending' ) {
+		$signup_enabled = '0';
+		$booking_url    = '';
+		$booking_text   = '';
+	}
+
 	// ---------------------------------------------------------------------------
 	// Build post array
 	// ---------------------------------------------------------------------------
@@ -400,6 +418,7 @@ function ce_upsert_churchsuite_event( $cs, $site_lookup = array() ) {
 		'event_source_id'            => $identifier,
 		'event_churchsuite_id'       => $identifier,
 		'event_churchsuite_category' => ! empty( $cs['category']['name'] ) ? sanitize_text_field( $cs['category']['name'] ) : '',
+		'event_status'               => $cs_status,
 	);
 
 	foreach ( $meta as $key => $value ) {
