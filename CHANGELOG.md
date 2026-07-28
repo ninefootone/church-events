@@ -2,6 +2,11 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.7.47
+
+### Fixed
+- `limit_mobile` on `[church_events_list]` was ignored whenever it exceeded `limit_tablet` (e.g. `limit_tablet="2" limit_mobile="3"` showed only 2 cards on mobile, not 3). The tablet cap was emitted at `max-width:1024px`, which also matches mobile widths, and its `display:none !important` was never lifted at the mobile breakpoint — so a wider mobile limit could never re-reveal a card the tablet rule had already hidden. The tablet rule is now bounded to `769px–1024px` so it no longer leaks into mobile. The documented `limit_mobile=""` "inherit tablet" behaviour is preserved by making that fallback explicit in PHP rather than relying on the leak.
+
 ## 1.7.46
 
 ### Added

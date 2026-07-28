@@ -188,7 +188,7 @@ function ce_elementor_mobile_fix_css() {
 function ce_build_responsive_limit_css( $uid, $tablet, $mobile ) {
 	$css = '';
 	if ( $tablet > 0 ) {
-		$css .= '@media (max-width:1024px){.' . $uid . ' .ce-event-card:nth-child(n+' . ( $tablet + 1 ) . '){display:none !important;}}';
+		$css .= '@media (min-width:769px) and (max-width:1024px){.' . $uid . ' .ce-event-card:nth-child(n+' . ( $tablet + 1 ) . '){display:none !important;}}';
 	}
 	if ( $mobile > 0 ) {
 		$css .= '@media (max-width:768px){.' . $uid . ' .ce-event-card:nth-child(n+' . ( $mobile + 1 ) . '){display:none !important;}}';
@@ -357,7 +357,7 @@ function ce_shortcode_list( $atts ) {
 	$data_limit    = $limit > 0 ? ' data-limit="' . esc_attr( $limit ) . '"' : '';
 	$show_controls = ! in_array( strtolower( (string) $atts['controls'] ), array( 'off', 'false', 'no', '0' ), true );
 	$limit_tablet  = ( $atts['limit_tablet'] !== '' ) ? max( 0, (int) $atts['limit_tablet'] ) : 0;
-	$limit_mobile  = ( $atts['limit_mobile'] !== '' ) ? max( 0, (int) $atts['limit_mobile'] ) : 0;
+	$limit_mobile  = ( $atts['limit_mobile'] !== '' ) ? max( 0, (int) $atts['limit_mobile'] ) : $limit_tablet;
 	$uid           = 'ce-' . substr( md5( uniqid( '', true ) ), 0, 8 );
 	$resp_css      = ce_build_responsive_limit_css( $uid, $limit_tablet, $limit_mobile );
 
