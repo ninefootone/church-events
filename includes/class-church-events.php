@@ -46,6 +46,7 @@ class Church_Events {
 		require_once CE_PLUGIN_DIR . 'includes/meta.php';
 		require_once CE_PLUGIN_DIR . 'includes/rest-api.php';
 		require_once CE_PLUGIN_DIR . 'includes/shortcodes.php';
+		require_once CE_PLUGIN_DIR . 'includes/http.php';
 		require_once CE_PLUGIN_DIR . 'includes/importer-churchsuite.php';
 		require_once CE_PLUGIN_DIR . 'includes/importer-google.php';
 		require_once CE_PLUGIN_DIR . 'includes/sync-monitor.php';

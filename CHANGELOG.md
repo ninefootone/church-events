@@ -2,6 +2,16 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.7.48
+
+### Added
+- Feed fetches now retry on transient failure. `ce_fetch_churchsuite_feed()` and `ce_fetch_google_events()` route through a new `ce_remote_get_retry()` (`includes/http.php`) that re-attempts a `wp_remote_get()` up to twice more (three tries total) with a 2-second backoff whenever it hits a `WP_Error` or a non-200. Most overnight "sync problem" emails were a single slow request while the server was under load from auto-updates or backups; a retry clears those within the same run, so they never become a recorded failure. Retry count (`ce_http_retries`) and backoff (`ce_http_retry_backoff`) are both filterable.
+- Sync-failure emails are sent only after failures persist. A consecutive-failure counter (`ce_sync_fail_streak`, maintained by the importers) gates the `error` email behind `ce_sync_fail_threshold()` (default 3, filterable). With the hourly sync that is roughly three hours of sustained failure before an alert, so a single self-healing blip stays silent. The `stale` alert is unchanged and still fires immediately, since it already represents 3+ intervals without a refresh (e.g. cron has stopped).
+- Alert emails now include the consecutive-failure count and the last successful sync time (with "X ago"), so a real alert is diagnostic rather than a bare "sync problem".
+
+### Fixed
+- The time of the last successful sync is now recorded separately (`ce_last_success_time`, written only on a successful import). Previously a failed run overwrote `ce_last_sync_status['time']` with the failure time, losing the record of when good data last landed; the alert email can now report it truthfully.
+
 ## 1.7.47
 
 ### Fixed

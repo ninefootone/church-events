@@ -26,6 +26,17 @@ function ce_sync_stale_multiplier() {
 }
 
 /**
+ * How many consecutive failed syncs before an email is sent.
+ *
+ * With an hourly sync, the default of 3 means roughly three hours of
+ * sustained failure before you are alerted - long enough that a single
+ * transient blip, which the next run clears, never reaches you.
+ */
+function ce_sync_fail_threshold() {
+	return (int) apply_filters( 'ce_sync_fail_threshold', 3 );
+}
+
+/**
  * Map a WP-Cron schedule slug to its length in seconds.
  */
 function ce_interval_seconds( $slug ) {
@@ -127,14 +138,34 @@ function ce_sync_check_and_alert() {
 		return;
 	}
 
+	$fail_streak = (int) get_option( 'ce_sync_fail_streak', 0 );
+
+	// Transient failures self-heal on the next run, so hold off on an 'error'
+	// email until failures have persisted across several consecutive syncs.
+	// 'stale' is exempt: it already means data has gone un-refreshed for 3+
+	// intervals (e.g. cron has stopped), which is worth knowing immediately.
+	if ( $health['state'] === 'error' && $fail_streak < ce_sync_fail_threshold() ) {
+		return;
+	}
+
 	$site    = wp_parse_url( home_url(), PHP_URL_HOST );
 	$subject = sprintf( '[Church Events] Sync %1$s on %2$s', $health['state'], $site );
+
+	$last_success = get_option( 'ce_last_success_time', '' );
 
 	$body  = "The Church Events plugin has detected a sync problem.\n\n";
 	$body .= 'Site: ' . home_url() . "\n";
 	$body .= 'Status: ' . $health['state'] . "\n";
-	$body .= 'Detail: ' . $health['message'] . "\n\n";
-	$body .= "You will not be emailed again about this issue until it recovers and then fails again.\n";
+	$body .= 'Detail: ' . $health['message'] . "\n";
+	if ( $health['state'] === 'error' ) {
+		$body .= 'Consecutive failed syncs: ' . $fail_streak . "\n";
+	}
+	if ( $last_success ) {
+		$body .= sprintf( "Last successful sync: %s (%s ago)\n", $last_success, human_time_diff( strtotime( $last_success ), current_time( 'timestamp' ) ) );
+	} else {
+		$body .= "Last successful sync: none recorded\n";
+	}
+	$body .= "\nYou will not be emailed again about this issue until it recovers and then fails again.\n";
 
 	$sent = wp_mail( $recipient, $subject, $body );
 

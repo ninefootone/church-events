@@ -100,6 +100,7 @@ function ce_run_google_import() {
 			'status'  => 'error',
 			'message' => $events->get_error_message(),
 		) );
+		update_option( 'ce_sync_fail_streak', (int) get_option( 'ce_sync_fail_streak', 0 ) + 1 );
 		return array( 'imported' => 0, 'updated' => 0, 'skipped' => 0, 'errors' => 1, 'trashed' => 0 );
 	}
 
@@ -139,6 +140,8 @@ function ce_run_google_import() {
 		'message' => $summary,
 		'counts'  => $counts,
 	) );
+	update_option( 'ce_last_success_time', current_time( 'mysql' ) );
+	update_option( 'ce_sync_fail_streak', 0 );
 
 	return $counts;
 	} finally {
@@ -189,7 +192,7 @@ function ce_fetch_google_events( $calendar_id, $api_key ) {
 			'https://www.googleapis.com/calendar/v3/calendars/' . $encoded_id . '/events'
 		);
 
-		$response = wp_remote_get( $url, array(
+		$response = ce_remote_get_retry( $url, array(
 			'timeout'    => 30,
 			'user-agent' => 'WordPress/Church-Events-Plugin',
 		) );
