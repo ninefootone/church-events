@@ -40,6 +40,22 @@ function ce_schedule_churchsuite_cron() {
 add_action( 'ce_settings_saved', 'ce_schedule_churchsuite_cron' );
 
 /**
+ * Self-heal: ensure the sync event is scheduled if it has gone missing.
+ *
+ * ce_schedule_churchsuite_cron() only runs on activation and on settings-save,
+ * so if the cron event ever falls out of WordPress's schedule, nothing re-adds
+ * it (a plugin update does not fire the activation hook). This runs on every
+ * load and reschedules only when the event is genuinely absent, so it never
+ * resets an already-scheduled timer.
+ */
+function ce_ensure_churchsuite_cron() {
+	if ( ce_get_option( 'source_type' ) !== 'churchsuite' ) return;
+	if ( wp_next_scheduled( 'ce_churchsuite_sync' ) ) return;
+	wp_schedule_event( time(), ce_get_option( 'sync_interval', 'hourly' ), 'ce_churchsuite_sync' );
+}
+add_action( 'init', 'ce_ensure_churchsuite_cron' );
+
+/**
  * Clear cron on deactivation.
  */
 function ce_clear_churchsuite_cron() {

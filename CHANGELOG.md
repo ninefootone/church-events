@@ -2,6 +2,11 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.7.49
+
+### Fixed
+- The sync cron event now self-heals. Previously the event was only (re)scheduled on plugin activation and on settings-save, so if `ce_churchsuite_sync` / `ce_google_sync` ever fell out of WordPress's schedule it stayed gone (a plugin update does not fire the activation hook). A new `init` check reschedules the active source's event whenever it is missing, without resetting an existing timer. This ensures the event *exists*; a site whose WP-Cron is not firing (low traffic or a broken loopback) still needs a real server cron hitting `wp-cron.php`.
+
 ## 1.7.48
 
 ### Added
