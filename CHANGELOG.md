@@ -2,6 +2,11 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.7.50
+
+### Changed
+- View pills now lead with the default view. The pill for the configured default view (Calendar/Cards/List) is rendered first in the toolbar, instead of always following the fixed calendar → cards → list order. The remaining pills keep their relative order, and the change is display-only — `enabled_views` and the active-view logic are unaffected.
+
 ## 1.7.49
 
 ### Fixed

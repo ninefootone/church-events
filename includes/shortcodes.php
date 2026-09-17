@@ -418,6 +418,16 @@ function ce_shortcode_list( $atts ) {
  */
 function ce_render_toolbar( $enabled_views, $default_view = '', $locked_site = '', $locked_category = '' ) {
 	$show_toggle = count( $enabled_views ) > 1;
+
+	// Order the view pills so the default view sits first. Local copy only (passed
+	// by value), so $enabled_views elsewhere is unaffected.
+	if ( $default_view && in_array( $default_view, $enabled_views, true ) ) {
+		$enabled_views = array_merge(
+			array( $default_view ),
+			array_values( array_filter( $enabled_views, fn( $v ) => $v !== $default_view ) )
+		);
+	}
+
 	$date_filter = ce_get_option( 'date_filter_type', 'month' );
 	$show_month  = ( $date_filter === 'month' );
 
