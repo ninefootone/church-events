@@ -304,6 +304,29 @@ function ce_upsert_churchsuite_event( $cs, $site_lookup = array() ) {
 		return 'skipped';
 	}
 
+	// ---------------------------------------------------------------------------
+	// Per-site category exclusion (Settings → Import → Exclude Categories).
+	// Matched on the ChurchSuite category ID, not the name, so renaming a
+	// category in ChurchSuite can't silently undo it. An already-imported event
+	// in an excluded category is trashed so it drops off the site on this sync.
+	// Un-excluding re-imports it as a fresh post on the next sync (the trashed
+	// copy is not looked up, and WordPress empties it after 30 days).
+	// ---------------------------------------------------------------------------
+	$ce_excluded_cats = array_map( 'strval', (array) ce_get_option( 'cs_excluded_categories', array() ) );
+	$ce_cs_cat_id     = isset( $cs['category']['id'] ) ? (string) $cs['category']['id'] : '';
+
+	if ( $ce_cs_cat_id !== '' && in_array( $ce_cs_cat_id, $ce_excluded_cats, true ) ) {
+		$existing = ce_get_post_by_churchsuite_id( $identifier, $cs['id'] ?? null );
+		if ( $existing && 'trash' !== $existing->post_status ) {
+			wp_trash_post( $existing->ID );
+			ce_log( sprintf(
+				'Trashed excluded-category (%s) event: %s (%s)',
+				$cs['category']['name'] ?? $ce_cs_cat_id, $cs['name'] ?? '', $identifier
+			) );
+		}
+		return 'skipped';
+	}
+
 	// Check if post already exists by ChurchSuite identifier
 	$existing = ce_get_post_by_churchsuite_id( $identifier, $cs['id'] ?? null );
 	$post_id  = $existing ? $existing->ID : 0;
@@ -449,7 +472,7 @@ function ce_upsert_churchsuite_event( $cs, $site_lookup = array() ) {
 	// ---------------------------------------------------------------------------
 
 	if ( ! empty( $cs['category']['name'] ) ) {
-		ce_assign_category( $post_id, $cs['category']['name'], $cs['category']['color'] ?? '' );
+		ce_assign_category( $post_id, $cs['category']['name'], $cs['category']['color'] ?? '', $cs['category']['id'] ?? '' );
 	}
 
 	// ---------------------------------------------------------------------------
@@ -545,7 +568,7 @@ function ce_get_post_by_churchsuite_id( $identifier, $numeric_id = null ) {
  * @param int    $post_id
  * @param string $category_name
  */
-function ce_assign_category( $post_id, $category_name, $category_color = '' ) {
+function ce_assign_category( $post_id, $category_name, $category_color = '', $cs_category_id = '' ) {
 	$category_name = sanitize_text_field( $category_name );
 	$slug          = sanitize_title( $category_name );
 
@@ -556,8 +579,15 @@ function ce_assign_category( $post_id, $category_name, $category_color = '' ) {
 
 	wp_set_object_terms( $post_id, $slug, 'event-category', false );
 
-	// Seed colour from ChurchSuite only if none set — manual edits win
 	$term = get_term_by( 'slug', $slug, 'event-category' );
+
+	// Remember the ChurchSuite category ID so per-site exclusions survive a
+	// category rename in ChurchSuite. Always refreshed — ChurchSuite owns it.
+	if ( $term && ! is_wp_error( $term ) && $cs_category_id !== '' && $cs_category_id !== null ) {
+		update_term_meta( $term->term_id, 'ce_cs_category_id', (string) $cs_category_id );
+	}
+
+	// Seed colour from ChurchSuite only if none set — manual edits win
 	if ( $term && ! is_wp_error( $term ) && empty( get_term_meta( $term->term_id, 'ce_category_color', true ) ) ) {
 		$color = sanitize_hex_color( $category_color );
 		if ( $color ) {

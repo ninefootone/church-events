@@ -180,6 +180,14 @@ function ce_sanitize_settings( $input ) {
 	$sanitized['pending_badge_bg'] = isset( $input['pending_badge_bg'] ) ? ( sanitize_hex_color( $input['pending_badge_bg'] ) ?: ( $sanitized['pending_badge_bg'] ?? '#6b7280' ) ) : ( $sanitized['pending_badge_bg'] ?? '#6b7280' );
 	$sanitized['pending_badge_fg'] = isset( $input['pending_badge_fg'] ) ? ( sanitize_hex_color( $input['pending_badge_fg'] ) ?: ( $sanitized['pending_badge_fg'] ?? '#ffffff' ) ) : ( $sanitized['pending_badge_fg'] ?? '#ffffff' );
 
+	// Per-site ChurchSuite category exclusions, stored as ChurchSuite category IDs.
+	// The hidden marker is only posted from the Import tab, so saving another tab
+	// leaves the list alone, while unticking every box on the Import tab clears it.
+	if ( isset( $input['cs_excluded_categories_present'] ) ) {
+		$ex_in = isset( $input['cs_excluded_categories'] ) ? (array) $input['cs_excluded_categories'] : array();
+		$sanitized['cs_excluded_categories'] = array_values( array_unique( array_filter( array_map( 'sanitize_text_field', $ex_in ), 'strlen' ) ) );
+	}
+
 	// Category pill placement
 	$sanitized['category_pill_position'] = ( isset( $input['category_pill_position'] ) && in_array( $input['category_pill_position'], array( 'image', 'above', 'below' ), true ) ) ? $input['category_pill_position'] : ( $sanitized['category_pill_position'] ?? 'image' );
 
@@ -407,6 +415,55 @@ function ce_render_tab_import( $s ) {
 			<td>
 				<input type="url" id="ce_churchsuite_url" name="ce_settings[churchsuite_url]" value="<?php echo esc_url( $cs_url ); ?>" class="regular-text" />
 				<p class="description"><?php esc_html_e( 'The public JSON feed URL from your ChurchSuite account.', 'church-events' ); ?></p>
+			</td>
+		</tr>
+
+		<tr class="ce-source-row ce-source-churchsuite">
+			<th><?php esc_html_e( 'Exclude Categories', 'church-events' ); ?></th>
+			<td>
+				<?php
+				$ex_ids      = isset( $s['cs_excluded_categories'] ) ? array_map( 'strval', (array) $s['cs_excluded_categories'] ) : array();
+				$ex_terms    = get_terms( array( 'taxonomy' => 'event-category', 'hide_empty' => false ) );
+				$ex_by_id    = array(); // ChurchSuite ID => term names (a renamed category leaves two terms with one ID)
+				$ex_unlinked = array(); // terms not yet synced since this setting existed
+				if ( ! is_wp_error( $ex_terms ) ) {
+					foreach ( $ex_terms as $ex_term ) {
+						$ex_cid = (string) get_term_meta( $ex_term->term_id, 'ce_cs_category_id', true );
+						if ( $ex_cid === '' ) {
+							$ex_unlinked[] = $ex_term->name;
+						} else {
+							$ex_by_id[ $ex_cid ][] = $ex_term->name;
+						}
+					}
+				}
+				// Keep excluded IDs whose term has since been deleted visible, so they can be unticked.
+				foreach ( $ex_ids as $ex_cid ) {
+					if ( ! isset( $ex_by_id[ $ex_cid ] ) ) {
+						/* translators: %s: ChurchSuite category ID */
+						$ex_by_id[ $ex_cid ] = array( sprintf( __( 'ChurchSuite category #%s (no longer on this site)', 'church-events' ), $ex_cid ) );
+					}
+				}
+				?>
+				<input type="hidden" name="ce_settings[cs_excluded_categories_present]" value="1" />
+				<?php if ( empty( $ex_by_id ) && empty( $ex_unlinked ) ) : ?>
+					<p class="description"><?php esc_html_e( 'No categories yet. Run a sync first, then come back here.', 'church-events' ); ?></p>
+				<?php else : ?>
+					<?php foreach ( $ex_by_id as $ex_cid => $ex_names ) : ?>
+						<label style="display:block;margin-bottom:4px;">
+							<input type="checkbox" name="ce_settings[cs_excluded_categories][]" value="<?php echo esc_attr( $ex_cid ); ?>" <?php checked( in_array( (string) $ex_cid, $ex_ids, true ) ); ?> />
+							<?php echo esc_html( implode( ' / ', array_unique( $ex_names ) ) ); ?>
+						</label>
+					<?php endforeach; ?>
+					<?php if ( $ex_unlinked ) : ?>
+						<p class="description" style="margin-top:8px;">
+							<?php
+							/* translators: %s: comma-separated category names */
+							echo esc_html( sprintf( __( 'Not selectable until the next sync links them to ChurchSuite: %s', 'church-events' ), implode( ', ', $ex_unlinked ) ) );
+							?>
+						</p>
+					<?php endif; ?>
+				<?php endif; ?>
+				<p class="description"><?php esc_html_e( 'Ticked categories are not imported on this site, and events already imported from them are removed on the next sync. Matched by ChurchSuite category ID, so renaming a category in ChurchSuite will not undo this.', 'church-events' ); ?></p>
 			</td>
 		</tr>
 

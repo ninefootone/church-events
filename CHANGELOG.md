@@ -2,6 +2,12 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.7.51
+
+### Added
+- Per-site category exclusion for ChurchSuite imports. A new **Exclude Categories** checkbox list on Settings → Import lets a site skip chosen ChurchSuite categories. Excluded events are not imported, and events already imported from an excluded category are trashed on the next sync. Un-excluding re-imports them on the following sync. Exclusions are stored as ChurchSuite category IDs (new `cs_excluded_categories` setting), so renaming a category in ChurchSuite does not undo them.
+- `ce_assign_category()` now stores the ChurchSuite category ID on each `event-category` term (`ce_cs_category_id` term meta). Categories become selectable in the exclusion list once a sync has run on this version.
+
 ## 1.7.50
 
 ### Changed
