@@ -111,6 +111,46 @@
 		);
 	}
 
+	// "8 Nov" (withDay=false) or "Sun 8 Nov" (withDay=true), in the page language.
+	function formatShortDate( dateStr, withDay ) {
+		if ( ! dateStr || dateStr.length < 8 ) return '';
+		var y = parseInt( dateStr.substring( 0, 4 ), 10 );
+		var m = parseInt( dateStr.substring( 4, 6 ), 10 ) - 1;
+		var d = parseInt( dateStr.substring( 6, 8 ), 10 );
+		var opts = { day: 'numeric', month: 'short' };
+		if ( withDay ) opts.weekday = 'short';
+		return new Date( y, m, d ).toLocaleDateString( document.documentElement.lang || 'en-GB', opts );
+	}
+
+	// "Repeats • next 8 Nov" — only present when repeats are collapsed (cal_next_only).
+	function repeatsText( event ) {
+		var seq = event && event.event_sequence;
+		if ( ! seq || ! seq.next || ! cfg.i18n.repeatsNext ) return '';
+		return cfg.i18n.repeatsNext.replace( '%s', formatShortDate( seq.next, false ) );
+	}
+
+	// Modal list of the following dates, each with its own booking link.
+	function otherDatesHtml( event ) {
+		var seq = event && event.event_sequence;
+		if ( ! seq || ! seq.dates || ! seq.dates.length ) return '';
+		var items = seq.dates.map( function( o ) {
+			var t = ( o.all_day || ! formatTime( o.time ) ) ? cfg.i18n.allDay : formatTime( o.time );
+			var book = o.booking_url
+				? '<a class="ce-other-date-book" href="' + safeUrl( o.booking_url ) + '" target="_blank" rel="noopener noreferrer">'
+					+ escHtml( o.booking_text || cfg.i18n.bookNow ) + '</a>'
+				: '';
+			return '<li class="ce-other-date">'
+				+ '<span class="ce-other-date-when">' + escHtml( formatShortDate( o.date, true ) ) + '</span>'
+				+ '<span class="ce-other-date-time">' + escHtml( t ) + '</span>'
+				+ book + '</li>';
+		} ).join( '' );
+		return '<div class="ce-other-dates">'
+			+ '<p class="ce-other-dates-title">' + escHtml( cfg.i18n.otherDates ) + '</p>'
+			+ '<ul class="ce-other-dates-list">' + items + '</ul>'
+			+ ( seq.more ? '<p class="ce-other-dates-more">' + escHtml( cfg.i18n.moreDates ) + '</p>' : '' )
+			+ '</div>';
+	}
+
 	function formatTime( timeStr ) {
 		if ( ! timeStr || timeStr === '00:00:00' || timeStr === '00:00' ) return '';
 		return timeStr.substring( 0, 5 );
@@ -274,7 +314,9 @@
 				if ( ! ds ) return '';
 				const de = ( meta.end_date && meta.end_date !== meta.start_date )
 					? ' \u2013 ' + formatDate( meta.end_date ) : '';
-				return '<span class="ce-card-meta-item ce-meta-date">' + ds + de + '</span>';
+				const rp = ( context !== 'detail' ) ? repeatsText( event ) : '';
+				return '<span class="ce-card-meta-item ce-meta-date">' + ds + de + '</span>'
+					+ ( rp ? '<span class="ce-card-meta-item ce-meta-repeats">' + escHtml( rp ) + '</span>' : '' );
 			}
 
 			case 'time': {
@@ -416,6 +458,8 @@
 
 		if ( metaOpen ) html += '</div>';
 
+		html += otherDatesHtml( event );
+
 		if ( event.event_url ) {
 			var footerHtml = '<div class="ce-modal-footer">';
 			if ( cfg.interaction === 'page' ) {
@@ -477,6 +521,14 @@
 			}
 		}
 
+		var repeatsLine = '';
+		var rpText      = repeatsText( event );
+		if ( rpText ) {
+			repeatsLine = '<span class="ce-agenda-meta ce-agenda-repeats">'
+				+ '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>'
+				+ escHtml( rpText ) + '</span>';
+		}
+
 		var locationLine = '';
 		if ( meta.location ) {
 			locationLine = '<span class="ce-agenda-meta ce-agenda-location">'
@@ -499,6 +551,7 @@
 			+ '<div class="ce-agenda-detail-col">'
 			+ agTitleBlock
 			+ timeLine
+			+ repeatsLine
 			+ locationLine
 			+ '</div>'
 			+ imageHtml;

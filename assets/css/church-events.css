@@ -1052,3 +1052,64 @@
     text-transform: uppercase;
     color: var(--ce-text, currentColor);
 }
+
+/* -------------------------------------------------------------------------
+   Repeating events (collapsed series) — "Repeats • next 8 Nov" + modal dates
+   ------------------------------------------------------------------------- */
+
+.ce-meta-repeats {
+	flex-basis: 100%;
+	font-weight: 600;
+	color: var( --ce-secondary );
+}
+
+.ce-agenda-repeats {
+	color: var( --ce-secondary );
+	font-weight: 600;
+}
+
+.ce-other-dates {
+	margin: 0 0 1.25rem;
+	font-size: var( --ce-font-size-meta );
+}
+
+.ce-other-dates-title {
+	margin: 0 0 0.5rem;
+	font-weight: 700;
+	color: var( --ce-primary );
+}
+
+.ce-other-dates-list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.ce-other-date {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.25rem 1rem;
+	padding: 0.4rem 0;
+	border-top: 1px solid rgba( 0, 0, 0, 0.08 );
+	color: var( --ce-text );
+}
+
+.ce-other-date:first-child { border-top: 0; }
+
+.ce-other-date-when { min-width: 7em; font-weight: 600; }
+
+.ce-other-date-time { color: var( --ce-muted ); }
+
+.ce-other-date-book {
+	margin-left: auto;
+	color: var( --ce-secondary );
+	font-weight: 600;
+	text-decoration: underline;
+}
+
+.ce-other-dates-more {
+	margin: 0.4rem 0 0;
+	color: var( --ce-muted );
+	font-style: italic;
+}

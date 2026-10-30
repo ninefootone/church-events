@@ -2,6 +2,14 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.7.53
+
+### Added
+- When **Repeating Events** is on, a collapsed series is labelled **"Repeats • next 8 Nov"** (the following date) on cards and list (agenda) rows, so visitors can see an event recurs.
+- The detail modal shows an **Other dates** list of the next five dates in the series, each with its own sign-up link (ChurchSuite sign-up is per occurrence, so the card's button only books the next date). "More dates to follow" appears when the series continues beyond those five.
+- New `event_sequence` REST field (`next`, `dates`, `more`) built by `ce_get_later_occurrences()`. It is only computed on requests carrying `cal_next_only`, so the calendar view does no extra lookups. Null for one-offs, Google events and the last date in a series.
+- New translatable strings: `Repeats • next %s`, `Other dates`, `More dates to follow`.
+
 ## 1.7.52
 
 ### Added

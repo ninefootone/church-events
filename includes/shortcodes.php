@@ -248,6 +248,10 @@ function ce_build_js_config() {
 			'loadMore'        => __( 'Load More', 'church-events' ),
 			'dateFrom'        => __( 'From', 'church-events' ),
 			'dateTo'          => __( 'To', 'church-events' ),
+			/* translators: %s: short date of the next occurrence, e.g. "8 Nov" */
+			'repeatsNext'     => __( 'Repeats • next %s', 'church-events' ),
+			'otherDates'      => __( 'Other dates', 'church-events' ),
+			'moreDates'       => __( 'More dates to follow', 'church-events' ),
 		),
 		'perPage'         => (int) ce_get_option( 'per_page', 12 ),
 		'nextOnly'        => (bool) ce_get_option( 'next_occurrence_only', false ),

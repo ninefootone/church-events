@@ -122,6 +122,64 @@ function ce_rest_event_query( $args, $request ) {
 add_filter( 'rest_event_query', 'ce_rest_event_query', 10, 2 );
 
 /**
+ * Later occurrences of the same ChurchSuite sequence, after the given event.
+ *
+ * "Later" uses the list order: start date, then start time, then ID. Each date
+ * carries its own booking URL, because ChurchSuite sign-up is per occurrence.
+ *
+ * @param int $post_id
+ * @param int $limit    Max dates returned.
+ * @return array|null   { next: YYYYMMDD, dates: [...], more: bool } or null.
+ */
+function ce_get_later_occurrences( $post_id, $limit = 5 ) {
+	$seq  = (string) get_post_meta( $post_id, 'event_sequence_id', true );
+	$date = (string) get_post_meta( $post_id, 'event_start_date', true );
+	$time = (string) get_post_meta( $post_id, 'event_start_time', true );
+	if ( $seq === '' || $date === '' ) return null;
+
+	$q = new WP_Query( array(
+		'post_type'      => 'event',
+		'post_status'    => 'publish',
+		'posts_per_page' => $limit + 6, // headroom: same-day earlier ones are dropped below
+		'fields'         => 'ids',
+		'no_found_rows'  => true,
+		'post__not_in'   => array( (int) $post_id ),
+		'meta_query'     => array(
+			'relation' => 'AND',
+			'ce_seq'   => array( 'key' => 'event_sequence_id', 'value' => $seq ),
+			'ce_date'  => array( 'key' => 'event_start_date', 'value' => (int) $date, 'compare' => '>=', 'type' => 'NUMERIC' ),
+			'ce_time'  => array( 'key' => 'event_start_time', 'compare' => 'EXISTS', 'type' => 'CHAR' ),
+		),
+		'orderby'        => array( 'ce_date' => 'ASC', 'ce_time' => 'ASC', 'ID' => 'ASC' ),
+	) );
+
+	$dates = array();
+	foreach ( $q->posts as $id ) {
+		$d = (string) get_post_meta( $id, 'event_start_date', true );
+		$t = (string) get_post_meta( $id, 'event_start_time', true );
+		// Same day as this event: keep only ones that come after it.
+		if ( $d === $date && ( $t < $time || ( $t === $time && $id < $post_id ) ) ) continue;
+		$dates[] = array(
+			'date'         => $d,
+			'time'         => $t,
+			'all_day'      => (bool) get_post_meta( $id, 'event_all_day', true ),
+			'booking_url'  => get_post_meta( $id, 'event_booking_url', true ),
+			'booking_text' => get_post_meta( $id, 'event_booking_text', true ),
+		);
+		if ( count( $dates ) > $limit ) break;
+	}
+
+	if ( ! $dates ) return null;
+
+	$more = count( $dates ) > $limit;
+	return array(
+		'next'  => $dates[0]['date'],
+		'dates' => array_slice( $dates, 0, $limit ),
+		'more'  => $more,
+	);
+}
+
+/**
  * Hide every occurrence of a repeating event except the earliest one on or after
  * the range start. Done in SQL (not in the browser) so pagination, X-WP-Total and
  * per-block limits all count one card per series.
@@ -203,6 +261,17 @@ function ce_rest_expose_meta() {
 				'booking_text' => get_post_meta( $post['id'], 'event_booking_text', true ),
 				'status'       => get_post_meta( $post['id'], 'event_status', true ),
 			);
+		},
+		'schema' => null,
+	) );
+
+	// Later dates in the same ChurchSuite sequence. Only computed when the cards /
+	// list views ask for collapsed repeats (cal_next_only) — the calendar already
+	// shows every date, so it never pays for these lookups. Null for one-offs.
+	register_rest_field( 'event', 'event_sequence', array(
+		'get_callback' => function( $post, $field_name, $request ) {
+			if ( ! $request || ! $request->get_param( 'cal_next_only' ) ) return null;
+			return ce_get_later_occurrences( $post['id'] );
 		},
 		'schema' => null,
 	) );
