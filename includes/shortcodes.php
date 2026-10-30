@@ -343,6 +343,7 @@ function ce_shortcode_list( $atts ) {
 		'limit_mobile' => '',    // max cards shown at <=768px;  '' = inherit tablet, else limit
 		'featured' => '',        // 'true' | '1' | 'yes' | 'on' restricts to featured events only
 		'controls' => 'on',      // 'off' | 'false' | 'no' | '0' hides the toolbar (search/filters/toggle)
+		'hide_repeats' => '',    // 'yes' = one card per repeating series (next date only); 'no' = every date; '' = site setting
 		// Legacy alias — honoured so existing shortcodes keep working
 		'view'     => '',
 	), $atts, 'church_events_list' );
@@ -360,6 +361,13 @@ function ce_shortcode_list( $atts ) {
 	$data_featured = $is_featured ? ' data-locked-featured="1"' : '';
 	$limit         = max( 0, (int) $atts['limit'] );
 	$data_limit    = $limit > 0 ? ' data-limit="' . esc_attr( $limit ) . '"' : '';
+	$hide_repeats  = strtolower( trim( (string) $atts['hide_repeats'] ) );
+	$data_next     = '';
+	if ( in_array( $hide_repeats, array( 'yes', 'true', '1', 'on' ), true ) ) {
+		$data_next = ' data-next-only="1"';
+	} elseif ( in_array( $hide_repeats, array( 'no', 'false', '0', 'off' ), true ) ) {
+		$data_next = ' data-next-only="0"';
+	}
 	$show_controls = ! in_array( strtolower( (string) $atts['controls'] ), array( 'off', 'false', 'no', '0' ), true );
 	$limit_tablet  = ( $atts['limit_tablet'] !== '' ) ? max( 0, (int) $atts['limit_tablet'] ) : 0;
 	$limit_mobile  = ( $atts['limit_mobile'] !== '' ) ? max( 0, (int) $atts['limit_mobile'] ) : $limit_tablet;
@@ -385,7 +393,7 @@ function ce_shortcode_list( $atts ) {
 	} else {
 		?>
 		<?php echo $resp_css; ?>
-		<div class="church-events <?php echo esc_attr( $uid ); ?>" data-ce-root data-default-view="<?php echo esc_attr( $layout ); ?>" data-columns="<?php echo esc_attr( $atts['columns'] ); ?>"<?php echo $data_site . $data_category . $data_featured . $data_limit; ?>>
+		<div class="church-events <?php echo esc_attr( $uid ); ?>" data-ce-root data-default-view="<?php echo esc_attr( $layout ); ?>" data-columns="<?php echo esc_attr( $atts['columns'] ); ?>"<?php echo $data_site . $data_category . $data_featured . $data_limit . $data_next; ?>>
 
 			<?php if ( $show_controls ) ce_render_toolbar( array( $layout ), $layout, $atts['site'], $atts['category'] ); ?>
 

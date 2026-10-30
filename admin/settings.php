@@ -1127,6 +1127,7 @@ function ce_render_tab_shortcodes() {
 					<code>limit_tablet="2"</code> <?php esc_html_e( '— fewer cards on tablet (blank = same as limit)', 'church-events' ); ?><br>
 					<code>limit_mobile="1"</code> <?php esc_html_e( '— fewer cards on mobile (blank = inherit tablet, else limit)', 'church-events' ); ?><br>
 					<code>featured="true"</code> <?php esc_html_e( '— only events flagged featured in ChurchSuite', 'church-events' ); ?><br>
+					<code>hide_repeats="yes"</code> <?php esc_html_e( '— one card per repeating event, showing its next date ("no" shows every date; blank follows the Repeating Events setting)', 'church-events' ); ?><br>
 					<code>category="youth"</code><br>
 					<code>site="central"</code>
 				</td>

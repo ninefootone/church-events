@@ -2,6 +2,11 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.7.55
+
+### Added
+- `hide_repeats` attribute on `[church_events_list]`. `hide_repeats="yes"` shows one card/row per repeating ChurchSuite series (its next date, with the "Repeats • next …" label and the modal's Other dates list) — e.g. for a featured-events strip where a weekly event would otherwise fill every slot. `hide_repeats="no"` forces every date; leaving it out follows the site-wide **Repeating Events** setting, so existing shortcodes are unaffected.
+
 ## 1.7.54
 
 ### Added

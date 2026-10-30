@@ -219,7 +219,7 @@
 		if ( filters.search )   url += '&event_search='   + encodeURIComponent( filters.search );
 		if ( filters.featured ) url += '&event_featured=1';
 		// Cards + list views only — the calendar uses fetchEvents() and keeps every date.
-		if ( cfg.nextOnly )     url += '&cal_next_only=1';
+		if ( filters.nextOnly ) url += '&cal_next_only=1';
 
 		const response = await fetch( url, { headers: { 'X-WP-Nonce': cfg.restNonce } } );
 		if ( ! response.ok ) return { events: [], total: 0, totalPages: 0 };
@@ -1062,6 +1062,9 @@
 			site:     this.lockedSite     || this.activeSite,
 			search:   this.activeSearch,
 			featured: this.root.dataset.lockedFeatured || '',
+			// Shortcode hide_repeats="yes|no" (data-next-only) wins; otherwise the site setting.
+			nextOnly: this.root.dataset.nextOnly === '1'
+				|| ( this.root.dataset.nextOnly !== '0' && !! cfg.nextOnly ),
 		};
 	};
 
