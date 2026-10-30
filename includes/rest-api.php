@@ -27,6 +27,7 @@ function ce_rest_event_query( $args, $request ) {
 		'event_site'     => $request->get_param( 'event_site' ),
 		'event_search'   => $request->get_param( 'event_search' ),
 		'event_featured' => $request->get_param( 'event_featured' ),
+		'cal_next_only'  => $request->get_param( 'cal_next_only' ),
 	);
 
 	$cal_after  = $request->get_param( 'cal_after' );
@@ -87,6 +88,13 @@ function ce_rest_event_query( $args, $request ) {
 		$args['s'] = sanitize_text_field( $search );
 	}
 
+	// Next occurrence only — collapse each repeating series to its first date in
+	// range. Sent by the cards and list views when the setting is on; the
+	// calendar never sends it. The SQL lives in ce_filter_next_occurrence_only().
+	if ( $request->get_param( 'cal_next_only' ) && $cal_after ) {
+		$args['ce_next_only_after'] = (int) preg_replace( '/[^0-9]/', '', $cal_after );
+	}
+
 	// Order by start date, then start time, both ascending — so events on the same day
 	// appear in chronological order. The date-only sort left same-day events tied and
 	// MySQL returned them in an undefined order. Named meta_query clauses let us sort on
@@ -112,6 +120,67 @@ function ce_rest_event_query( $args, $request ) {
 	return $args;
 }
 add_filter( 'rest_event_query', 'ce_rest_event_query', 10, 2 );
+
+/**
+ * Hide every occurrence of a repeating event except the earliest one on or after
+ * the range start. Done in SQL (not in the browser) so pagination, X-WP-Total and
+ * per-block limits all count one card per series.
+ *
+ * "Earlier" uses the same order as the list: start date, then start time, then ID.
+ * Events with no sequence ID (one-offs, Google imports) are never hidden.
+ * The earlier occurrence is not required to match the category/site/search
+ * filters — a series is assumed to keep the same category throughout.
+ *
+ * @param string   $where
+ * @param WP_Query $query
+ * @return string
+ */
+function ce_filter_next_occurrence_only( $where, $query ) {
+	$after = (int) $query->get( 'ce_next_only_after' );
+	if ( ! $after ) return $where;
+
+	global $wpdb;
+
+	$where .= $wpdb->prepare( " AND NOT EXISTS (
+		SELECT 1
+		FROM {$wpdb->postmeta} seq_self
+		INNER JOIN {$wpdb->postmeta} seq_other
+			ON  seq_other.meta_key   = 'event_sequence_id'
+			AND seq_other.meta_value = seq_self.meta_value
+			AND seq_other.post_id   <> seq_self.post_id
+		INNER JOIN {$wpdb->posts} p_other
+			ON  p_other.ID          = seq_other.post_id
+			AND p_other.post_type   = 'event'
+			AND p_other.post_status = 'publish'
+		INNER JOIN {$wpdb->postmeta} d_self
+			ON  d_self.post_id  = seq_self.post_id
+			AND d_self.meta_key = 'event_start_date'
+		INNER JOIN {$wpdb->postmeta} d_other
+			ON  d_other.post_id  = seq_other.post_id
+			AND d_other.meta_key = 'event_start_date'
+		LEFT JOIN {$wpdb->postmeta} t_self
+			ON  t_self.post_id  = seq_self.post_id
+			AND t_self.meta_key = 'event_start_time'
+		LEFT JOIN {$wpdb->postmeta} t_other
+			ON  t_other.post_id  = seq_other.post_id
+			AND t_other.meta_key = 'event_start_time'
+		WHERE seq_self.post_id    = {$wpdb->posts}.ID
+		  AND seq_self.meta_key   = 'event_sequence_id'
+		  AND seq_self.meta_value <> ''
+		  AND CAST( d_other.meta_value AS UNSIGNED ) >= %d
+		  AND (
+				CAST( d_other.meta_value AS UNSIGNED ) < CAST( d_self.meta_value AS UNSIGNED )
+				OR ( d_other.meta_value = d_self.meta_value AND (
+					COALESCE( t_other.meta_value, '' ) < COALESCE( t_self.meta_value, '' )
+					OR ( COALESCE( t_other.meta_value, '' ) = COALESCE( t_self.meta_value, '' )
+						AND seq_other.post_id < seq_self.post_id )
+				) )
+		  )
+	)", $after );
+
+	return $where;
+}
+add_filter( 'posts_where', 'ce_filter_next_occurrence_only', 10, 2 );
 
 /**
  * Expose event meta fields in the REST API response.

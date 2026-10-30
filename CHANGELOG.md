@@ -2,6 +2,13 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.7.52
+
+### Added
+- Optional **Repeating Events** setting (Display tab, default off): show only the next date of a repeating ChurchSuite event in the Cards and List views. A weekly service appears once instead of filling the list; the Calendar view still shows every date.
+- The ChurchSuite importer now stores each event's `sequence` ID as `event_sequence_id` meta (empty for one-offs). Existing events pick it up on the next sync.
+- New `cal_next_only` REST parameter. The collapse happens in SQL (`ce_filter_next_occurrence_only()`, a `posts_where` filter), keeping the earliest occurrence on or after `cal_after` by date, time then ID — so pagination, `X-WP-Total` and per-block limits count one card per series. Events without a sequence ID (one-offs, Google imports) are never hidden.
+
 ## 1.7.51
 
 ### Added

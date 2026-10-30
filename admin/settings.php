@@ -180,6 +180,9 @@ function ce_sanitize_settings( $input ) {
 	$sanitized['pending_badge_bg'] = isset( $input['pending_badge_bg'] ) ? ( sanitize_hex_color( $input['pending_badge_bg'] ) ?: ( $sanitized['pending_badge_bg'] ?? '#6b7280' ) ) : ( $sanitized['pending_badge_bg'] ?? '#6b7280' );
 	$sanitized['pending_badge_fg'] = isset( $input['pending_badge_fg'] ) ? ( sanitize_hex_color( $input['pending_badge_fg'] ) ?: ( $sanitized['pending_badge_fg'] ?? '#ffffff' ) ) : ( $sanitized['pending_badge_fg'] ?? '#ffffff' );
 
+	// Repeating events: show only the next occurrence in the cards + list views.
+	$sanitized['next_occurrence_only'] = isset( $input['next_occurrence_only'] ) ? (bool) $input['next_occurrence_only'] : ( $sanitized['next_occurrence_only'] ?? false );
+
 	// Per-site ChurchSuite category exclusions, stored as ChurchSuite category IDs.
 	// The hidden marker is only posted from the Import tab, so saving another tab
 	// leaves the list alone, while unticking every box on the Import tab clears it.
@@ -833,6 +836,19 @@ function ce_render_tab_display( $s ) {
 					<?php esc_html_e( 'Text', 'church-events' ); ?>
 					<input type="text" name="ce_settings[pending_badge_fg]" value="<?php echo esc_attr( $pb_fg ); ?>" class="ce-color-picker" />
 				</label>
+			</td>
+		</tr>
+
+		<tr>
+			<th><?php esc_html_e( 'Repeating Events', 'church-events' ); ?></th>
+			<td>
+				<?php $no_enabled = isset( $s['next_occurrence_only'] ) ? (bool) $s['next_occurrence_only'] : false; ?>
+				<input type="hidden" name="ce_settings[next_occurrence_only]" value="0" />
+				<label>
+					<input type="checkbox" name="ce_settings[next_occurrence_only]" value="1" <?php checked( $no_enabled, true ); ?> />
+					<?php esc_html_e( 'Show only the next date of a repeating event in the Cards and List views', 'church-events' ); ?>
+				</label>
+				<p class="description"><?php esc_html_e( 'Off (default): every date is shown. On: a weekly service appears once, as its next date in the selected range. The Calendar view always shows every date. Uses the ChurchSuite sequence, so it applies after the next sync; Google Calendar events are not grouped.', 'church-events' ); ?></p>
 			</td>
 		</tr>
 

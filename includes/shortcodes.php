@@ -250,6 +250,7 @@ function ce_build_js_config() {
 			'dateTo'          => __( 'To', 'church-events' ),
 		),
 		'perPage'         => (int) ce_get_option( 'per_page', 12 ),
+		'nextOnly'        => (bool) ce_get_option( 'next_occurrence_only', false ),
 		'listStyle'       => ce_get_option( 'list_style', 'cards' ),
 		'calendarFirstDay' => (int) ce_get_option( 'calendar_first_day', 1 ),
 	);

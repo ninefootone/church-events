@@ -461,6 +461,9 @@ function ce_upsert_churchsuite_event( $cs, $site_lookup = array() ) {
 		'event_churchsuite_id'       => $identifier,
 		'event_churchsuite_category' => ! empty( $cs['category']['name'] ) ? sanitize_text_field( $cs['category']['name'] ) : '',
 		'event_status'               => $cs_status,
+		// ChurchSuite sequence ID — shared by every occurrence of a repeating
+		// event. Empty for one-offs. Used to collapse a series to its next date.
+		'event_sequence_id'          => ! empty( $cs['sequence'] ) ? (string) absint( $cs['sequence'] ) : '',
 	);
 
 	foreach ( $meta as $key => $value ) {
