@@ -653,3 +653,110 @@ function ce_shortcode_event_date( $atts ) {
 	return esc_html( $start_str );
 }
 add_shortcode( 'ce_event_date', 'ce_shortcode_event_date' );
+
+// ---------------------------------------------------------------------------
+// Repeating events on single event pages (Elementor tags + shortcodes)
+// ---------------------------------------------------------------------------
+
+/**
+ * Load the plugin stylesheet (with colour variables and custom CSS) outside the
+ * calendar/list shortcodes — e.g. on single event templates. Safe to call twice.
+ */
+function ce_enqueue_core_style() {
+	if ( wp_style_is( 'church-events', 'enqueued' ) ) return;
+
+	wp_enqueue_style( 'church-events', CE_PLUGIN_URL . 'assets/css/church-events.css', array(), CE_VERSION );
+	wp_add_inline_style( 'church-events', ce_build_css_variables() );
+
+	$custom_css = ce_get_option( 'custom_css', '' );
+	if ( $custom_css ) {
+		wp_add_inline_style( 'church-events', $custom_css );
+	}
+}
+
+// Single event pages: load styles in the <head> so the Other dates list doesn't
+// flash unstyled. Priority 20 runs after ce_enqueue_frontend_assets().
+add_action( 'wp_enqueue_scripts', function() {
+	if ( is_singular( 'event' ) ) ce_enqueue_core_style();
+}, 20 );
+
+/**
+ * "Repeats • next 8 Nov" for an event, or '' when it has no later dates.
+ *
+ * @param int $post_id
+ * @return string Plain text (not escaped).
+ */
+function ce_repeats_label( $post_id ) {
+	$seq = ce_get_later_occurrences( $post_id );
+	if ( ! $seq ) return '';
+	/* translators: %s: short date of the next occurrence, e.g. "8 Nov" */
+	return sprintf( __( 'Repeats • next %s', 'church-events' ), ce_format_short_date( $seq['next'], 'j M' ) );
+}
+
+/**
+ * Format YYYYMMDD with an explicit PHP date format (translated day/month names).
+ */
+function ce_format_short_date( $raw, $format ) {
+	if ( ! $raw || strlen( $raw ) < 8 ) return '';
+	$ts = mktime( 0, 0, 0, (int) substr( $raw, 4, 2 ), (int) substr( $raw, 6, 2 ), (int) substr( $raw, 0, 4 ) );
+	return date_i18n( $format, $ts );
+}
+
+/**
+ * HTML list of the next dates in an event's series — same markup and classes
+ * as the modal, each date with its own sign-up link. '' when none.
+ *
+ * @param int  $post_id
+ * @param bool $show_title
+ * @param int  $limit
+ * @return string
+ */
+function ce_render_other_dates( $post_id, $show_title = true, $limit = 5 ) {
+	$seq = ce_get_later_occurrences( $post_id, max( 1, (int) $limit ) );
+	if ( ! $seq ) return '';
+
+	ce_enqueue_core_style(); // fallback if the template isn't a singular event page
+
+	$items = '';
+	foreach ( $seq['dates'] as $o ) {
+		$t = ( $o['all_day'] || ! $o['time'] || $o['time'] === '00:00' ) ? __( 'All day', 'church-events' ) : substr( $o['time'], 0, 5 );
+		$book = '';
+		if ( $o['booking_url'] ) {
+			$book = '<a class="ce-other-date-book" href="' . esc_url( $o['booking_url'] ) . '" target="_blank" rel="noopener noreferrer">'
+				. esc_html( $o['booking_text'] ? $o['booking_text'] : __( 'Book Now', 'church-events' ) ) . '</a>';
+		}
+		$items .= '<li class="ce-other-date">'
+			. '<span class="ce-other-date-when">' . esc_html( ce_format_short_date( $o['date'], 'D j M' ) ) . '</span>'
+			. '<span class="ce-other-date-time">' . esc_html( $t ) . '</span>'
+			. $book . '</li>';
+	}
+
+	return '<div class="church-events ce-other-dates ce-other-dates--single">'
+		. ( $show_title ? '<p class="ce-other-dates-title">' . esc_html__( 'Other dates', 'church-events' ) . '</p>' : '' )
+		. '<ul class="ce-other-dates-list">' . $items . '</ul>'
+		. ( $seq['more'] ? '<p class="ce-other-dates-more">' . esc_html__( 'More dates to follow', 'church-events' ) . '</p>' : '' )
+		. '</div>';
+}
+
+/**
+ * [ce_event_repeats] — "Repeats • next 8 Nov", or nothing for one-offs.
+ * Usage: [ce_event_repeats] or [ce_event_repeats post_id="123"]
+ */
+function ce_shortcode_event_repeats( $atts ) {
+	$atts    = shortcode_atts( array( 'post_id' => 0 ), $atts, 'ce_event_repeats' );
+	$post_id = $atts['post_id'] ? (int) $atts['post_id'] : get_the_ID();
+	return $post_id ? esc_html( ce_repeats_label( $post_id ) ) : '';
+}
+add_shortcode( 'ce_event_repeats', 'ce_shortcode_event_repeats' );
+
+/**
+ * [ce_other_dates] — list of the next dates in the series, with sign-up links.
+ * Usage: [ce_other_dates] or [ce_other_dates post_id="123" limit="5" title="no"]
+ */
+function ce_shortcode_other_dates( $atts ) {
+	$atts    = shortcode_atts( array( 'post_id' => 0, 'limit' => 5, 'title' => 'yes' ), $atts, 'ce_other_dates' );
+	$post_id = $atts['post_id'] ? (int) $atts['post_id'] : get_the_ID();
+	if ( ! $post_id ) return '';
+	return ce_render_other_dates( $post_id, $atts['title'] !== 'no', (int) $atts['limit'] );
+}
+add_shortcode( 'ce_other_dates', 'ce_shortcode_other_dates' );

@@ -2,6 +2,16 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.7.54
+
+### Added
+- Repeating-event details on single event pages. Two new Elementor dynamic tags under **Church Events**: **Event Repeats (next date)** outputs "Repeats • next 8 Nov" (empty for one-offs, so it works with hide-when-empty), and **Event Other Dates (list)** outputs the next dates in the series with per-date sign-up links (controls: show heading, number of dates). Matching shortcodes `[ce_event_repeats]` and `[ce_other_dates post_id="" limit="5" title="no"]`, documented on the Shortcodes tab.
+- These work on every site regardless of the Repeating Events setting, and use the same markup and styling as the modal list.
+- `ce_enqueue_core_style()` loads the plugin stylesheet (colour variables + custom CSS) on single event pages, which previously had none.
+
+### Changed
+- More space above the "Other dates" heading in the modal.
+
 ## 1.7.53
 
 ### Added

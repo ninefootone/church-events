@@ -184,6 +184,47 @@ class CE_Tag_ChurchSuite_Category extends CE_Dynamic_Tag_Base {
 	}
 }
 
+class CE_Tag_Repeats extends CE_Dynamic_Tag_Base {
+	public function get_name() { return 'ce-repeats'; }
+	public function get_title() { return __( 'Event Repeats (next date)', 'church-events' ); }
+	public function render() {
+		// "Repeats • next 8 Nov" — empty for one-offs and the last date in a series,
+		// so it can drive Elementor's "hide when empty" visibility.
+		echo esc_html( ce_repeats_label( get_the_ID() ) );
+	}
+}
+
+class CE_Tag_Other_Dates extends CE_Dynamic_Tag_Base {
+	public function get_name() { return 'ce-other-dates'; }
+	public function get_title() { return __( 'Event Other Dates (list)', 'church-events' ); }
+
+	protected function register_controls() {
+		$this->add_control( 'show_title', array(
+			'label'        => __( 'Show "Other dates" heading', 'church-events' ),
+			'type'         => \Elementor\Controls_Manager::SWITCHER,
+			'default'      => 'yes',
+			'return_value' => 'yes',
+		) );
+		$this->add_control( 'limit', array(
+			'label'   => __( 'Number of dates', 'church-events' ),
+			'type'    => \Elementor\Controls_Manager::NUMBER,
+			'default' => 5,
+			'min'     => 1,
+			'max'     => 20,
+		) );
+	}
+
+	public function render() {
+		// Built from escaped parts in ce_render_other_dates(). Use in a Text Editor
+		// or HTML widget — a Heading widget would show the markup as text.
+		echo ce_render_other_dates(
+			get_the_ID(),
+			'yes' === $this->get_settings( 'show_title' ),
+			(int) ( $this->get_settings( 'limit' ) ?: 5 )
+		); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	}
+}
+
 /**
  * Register the group and all tags once Elementor is ready.
  */
@@ -207,5 +248,7 @@ function ce_register_elementor_tags( $dynamic_tags ) {
 	$dynamic_tags->register( new CE_Tag_All_Day() );
 	$dynamic_tags->register( new CE_Tag_ChurchSuite_ID() );
 	$dynamic_tags->register( new CE_Tag_ChurchSuite_Category() );
+	$dynamic_tags->register( new CE_Tag_Repeats() );
+	$dynamic_tags->register( new CE_Tag_Other_Dates() );
 }
 add_action( 'elementor/dynamic_tags/register', 'ce_register_elementor_tags' );

@@ -1165,6 +1165,22 @@ function ce_render_tab_shortcodes() {
 					<code>format="j F Y"</code> <?php esc_html_e( '— PHP date format (optional)', 'church-events' ); ?>
 				</td>
 			</tr>
+			<tr>
+				<td><code>[ce_event_repeats]</code></td>
+				<td><?php esc_html_e( 'Outputs "Repeats • next 8 Nov" for a ChurchSuite event with later dates in its series; nothing for one-offs. Also available as the "Event Repeats" Elementor tag.', 'church-events' ); ?></td>
+				<td class="ce-sc-attr">
+					<code>post_id="123"</code> <?php esc_html_e( '— override post (optional)', 'church-events' ); ?>
+				</td>
+			</tr>
+			<tr>
+				<td><code>[ce_other_dates]</code></td>
+				<td><?php esc_html_e( 'Lists the next dates in the series, each with its own sign-up link. Also available as the "Event Other Dates" Elementor tag (use it in a Text Editor or HTML widget).', 'church-events' ); ?></td>
+				<td class="ce-sc-attr">
+					<code>post_id="123"</code> <?php esc_html_e( '— override post (optional)', 'church-events' ); ?><br>
+					<code>limit="5"</code> <?php esc_html_e( '— number of dates (optional)', 'church-events' ); ?><br>
+					<code>title="no"</code> <?php esc_html_e( '— hide the "Other dates" heading (optional)', 'church-events' ); ?>
+				</td>
+			</tr>
 		</tbody>
 	</table>
 
