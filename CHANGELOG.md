@@ -2,6 +2,11 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.7.56
+
+### Added
+- Optional `NFO_GITHUB_TOKEN` constant in wp-config.php. When set, update checks to GitHub are authenticated, which raises GitHub's limit from 60 checks an hour per server IP to 5,000 an hour for the token. Without it, updates work exactly as before. Use a classic token with no scopes and no expiry; never commit it to this repo.
+
 ## 1.7.55
 
 ### Added

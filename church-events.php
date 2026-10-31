@@ -3,7 +3,7 @@
  * Plugin Name: Church Events
  * Plugin URI: https://github.com/ninefootone/church-events
  * Description: A standalone church events plugin with calendar, list/grid views and ChurchSuite/Google Calendar import.
- * Version: 1.7.55
+ * Version: 1.7.56
  * Author: ninefootone creative
  * Author URI: https://github.com/ninefootone
  * License: GPL-2.0+
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Plugin constants
-define( 'CE_VERSION', '1.7.55' );
+define( 'CE_VERSION', '1.7.56' );
 define( 'CE_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'CE_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'CE_PLUGIN_FILE', __FILE__ );
@@ -31,6 +31,10 @@ $ce_update_checker = \YahnisElsts\PluginUpdateChecker\v5\PucFactory::buildUpdate
 	'church-events'
 );
 $ce_update_checker->getVcsApi()->enableReleaseAssets();
+// Optional GitHub token (wp-config.php) to raise GitHub's update-check limit. Never put it in this repo.
+if ( defined( 'NFO_GITHUB_TOKEN' ) && NFO_GITHUB_TOKEN ) {
+	$ce_update_checker->setAuthentication( NFO_GITHUB_TOKEN );
+}
 
 // Autoload includes
 require_once CE_PLUGIN_DIR . 'includes/class-church-events.php';
