@@ -22,11 +22,14 @@ A standalone WordPress plugin for church event management. Displays events via c
 
 ## Installation
 
-### Via Git Updater (recommended for multi-site deployment)
+### Updates
 
-1. Install the [Git Updater](https://git-updater.com/) plugin on your WordPress site
-2. Add your GitHub personal access token in Git Updater → Settings
-3. Install this plugin via Git Updater → Install Plugin, using the repo URL
+Updates come from this repo's GitHub releases via the bundled Plugin Update Checker (no other plugin needed). Install the release zip once (see Manual below); after that, updates appear in WordPress like any other plugin.
+
+Optional, for busy servers: add a GitHub token to `wp-config.php` (above `/* That's all, stop editing! */`) so update checks aren't limited to 60 an hour per server IP. Use a **classic** token with **no scopes** and **no expiry**, shared by all sites (Sermon Stats reads the same constant). Needs 1.7.56 or later. Never commit it here.
+```php
+define( 'NFO_GITHUB_TOKEN', 'ghp_...' );
+```
 
 ### Manual
 
