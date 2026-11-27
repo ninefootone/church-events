@@ -2,6 +2,16 @@
 
 All notable changes to Church Events are documented here.
 
+## 1.7.57
+
+### Added
+- `[church_events_calendar]` now accepts `controls="off"` (also `false`, `no`, `0`) to hide the toolbar, matching `[church_events_list]`. Previously the attribute was silently ignored on the calendar shortcode and the toolbar still rendered. With controls off, only the default view (or the `layout=` view) is shown, since the view toggle is part of the toolbar.
+- `controls="off"` is now documented for both shortcodes on the Shortcodes reference page and in the README.
+
+### Fixed
+- The site filter dropdown called `count()` on the `get_terms()` result before checking `is_wp_error()`. If the `event-site` lookup ever returned a `WP_Error`, PHP 8 would throw a fatal `TypeError` and break the page. The error check now runs first, so the dropdown is simply skipped.
+- README example used `layout="grid"`, which isn't a valid value (it silently fell back to cards); now `layout="cards"`.
+
 ## 1.7.56
 
 ### Added

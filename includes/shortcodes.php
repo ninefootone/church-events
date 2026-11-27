@@ -277,6 +277,7 @@ function ce_shortcode_calendar( $atts ) {
 		'layout'       => '', // optional: 'calendar' | 'cards' | 'list' — restricts to a single view
 		'site'         => '',
 		'category'     => '',
+		'controls'     => 'on', // 'off' | 'false' | 'no' | '0' hides the toolbar (search/filters/toggle)
 	), $atts, 'church_events_calendar' );
 
 	// If layout= is set to a single valid view, restrict to that view only
@@ -288,12 +289,13 @@ function ce_shortcode_calendar( $atts ) {
 
 	$data_site     = $atts['site']     ? ' data-locked-site="'     . esc_attr( $atts['site'] )     . '"' : '';
 	$data_category = $atts['category'] ? ' data-locked-category="' . esc_attr( $atts['category'] ) . '"' : '';
+	$show_controls = ! in_array( strtolower( (string) $atts['controls'] ), array( 'off', 'false', 'no', '0' ), true );
 
 	ob_start();
 	?>
 	<div class="church-events" data-ce-root data-default-view="<?php echo esc_attr( $atts['default_view'] ); ?>"<?php echo $data_site . $data_category; ?>>
 
-		<?php ce_render_toolbar( $enabled_views, $atts['default_view'], $atts['site'], $atts['category'] ); ?>
+		<?php if ( $show_controls ) ce_render_toolbar( $enabled_views, $atts['default_view'], $atts['site'], $atts['category'] ); ?>
 
 		<div class="ce-views">
 
@@ -502,7 +504,7 @@ function ce_render_toolbar( $enabled_views, $default_view = '', $locked_site = '
 			<?php endif; ?>
 		<?php
 		$site_terms = get_terms( array( 'taxonomy' => 'event-site', 'hide_empty' => true ) );
-		if ( ! $locked_site && count( $site_terms ) > 1 && ! is_wp_error( $site_terms ) ) : ?>
+		if ( ! $locked_site && ! is_wp_error( $site_terms ) && count( $site_terms ) > 1 ) : ?>
 			<?php
 			$site_label = ce_get_option( 'site_label', 'site' );
 			$all_label  = $site_label === 'church' ? __( 'All churches', 'church-events' ) : __( 'All sites', 'church-events' );

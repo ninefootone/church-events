@@ -1112,7 +1112,8 @@ function ce_render_tab_shortcodes() {
 					<code>layout="cards"</code> <?php esc_html_e( '— show only the card grid', 'church-events' ); ?><br>
 					<code>layout="list"</code> <?php esc_html_e( '— show only agenda rows', 'church-events' ); ?><br>
 					<code>category="youth"</code> <?php esc_html_e( '— lock to a category slug', 'church-events' ); ?><br>
-					<code>site="central"</code> <?php esc_html_e( '— lock to a site slug', 'church-events' ); ?>
+					<code>site="central"</code> <?php esc_html_e( '— lock to a site slug', 'church-events' ); ?><br>
+					<code>controls="off"</code> <?php esc_html_e( '— hide the toolbar (search, filters and view toggle); only the default view shows', 'church-events' ); ?>
 				</td>
 			</tr>
 			<tr>
@@ -1129,7 +1130,8 @@ function ce_render_tab_shortcodes() {
 					<code>featured="true"</code> <?php esc_html_e( '— only events flagged featured in ChurchSuite', 'church-events' ); ?><br>
 					<code>hide_repeats="yes"</code> <?php esc_html_e( '— one card per repeating event, showing its next date ("no" shows every date; blank follows the Repeating Events setting)', 'church-events' ); ?><br>
 					<code>category="youth"</code><br>
-					<code>site="central"</code>
+					<code>site="central"</code><br>
+					<code>controls="off"</code> <?php esc_html_e( '— hide the toolbar (search and filters)', 'church-events' ); ?>
 				</td>
 			</tr>
 		</tbody>

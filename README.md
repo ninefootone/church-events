@@ -41,8 +41,11 @@ define( 'NFO_GITHUB_TOKEN', 'ghp_...' );
 ```
 [church_events_calendar]
 [church_events_list]
-[church_events_list layout="grid" columns="3"]
+[church_events_list layout="cards" columns="3"]
+[church_events_list layout="cards" limit="3" controls="off"]
 ```
+
+Add `controls="off"` to either shortcode to hide the toolbar (search, filters and view toggle) on that instance. To hide just the category or site dropdown, lock it instead with `category="…"` or `site="…"`.
 
 ## Configuration
 
